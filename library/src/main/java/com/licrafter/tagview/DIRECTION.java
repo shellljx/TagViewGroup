@@ -1,0 +1,10 @@
+package com.licrafter.tagview;
+
+/**
+ * Created by lijx on 2016/12/20.
+ */
+
+public enum DIRECTION {
+    LEFT_CENTER, LEFT_TOP, LEFT_TOP_TILT, LEFT_BOTTOM, LEFT_BOTTOM_TILE,
+    RIGHT_CENTER, RIGHT_TOP, RIGHT_TOP_TILT, RIGHT_BOTTOM, RIGHT_BOTTOM_TILT
+}
