@@ -118,6 +118,10 @@ public class TagViewGroup extends ViewGroup {
                     break;
             }
         }
+        leftMax = leftMax == 0 ? mRadius : leftMax;
+        topMax = topMax == 0 ? mRadius : topMax;
+        rightMax = rightMax == 0 ? mRadius : rightMax;
+        bottomMax = bottomMax == 0 ? mRadius : bottomMax;
         return new int[]{leftMax, topMax, rightMax, bottomMax};
     }
 

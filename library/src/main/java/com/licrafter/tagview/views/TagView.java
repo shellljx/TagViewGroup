@@ -8,12 +8,13 @@ import android.widget.TextView;
 
 import com.licrafter.tagview.DIRECTION;
 import com.licrafter.tagview.TagViewGroup;
+import com.licrafter.tagview.utils.DipConvertUtils;
 
 /**
  * author: shell
  * date 2016/12/20 下午3:43
  **/
-public class TagView extends TextView {
+public class TagView extends TextView implements ITagView {
 
     private DIRECTION mDirection;
 
@@ -30,7 +31,8 @@ public class TagView extends TextView {
         setTextColor(Color.WHITE);
         setTextSize(13);
         setShadowLayer(7, 0, 0, Color.BLACK);
-        setPadding(dip2px(getContext(), 5), dip2px(getContext(), 2), dip2px(getContext(), 5), dip2px(getContext(), 2));
+        setPadding(DipConvertUtils.dip2px(getContext(), 5), DipConvertUtils.dip2px(getContext(), 2)
+                , DipConvertUtils.dip2px(getContext(), 5), DipConvertUtils.dip2px(getContext(), 2));
     }
 
     @Override
@@ -44,16 +46,14 @@ public class TagView extends TextView {
         return super.onTouchEvent(event);
     }
 
-    public DIRECTION getDirection() {
-        return mDirection;
-    }
 
+    @Override
     public void setDirection(DIRECTION direction) {
         mDirection = direction;
     }
 
-    public static int dip2px(Context context, float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
+    @Override
+    public DIRECTION getDirection() {
+        return mDirection;
     }
 }

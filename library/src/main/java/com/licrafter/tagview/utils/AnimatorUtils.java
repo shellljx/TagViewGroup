@@ -59,7 +59,7 @@ public class AnimatorUtils {
         ObjectAnimator tagTextAnimator = ObjectAnimator.ofFloat(target, "TagAlpha", 1, 0);
         Animator circleAnimator = circleRadiusAnimator(target);
         set.playTogether(linesAnimator, tagTextAnimator);
-        set.setDuration(500);
+        set.setDuration(400);
         set.setTarget(target);
         set.setInterpolator(new DecelerateInterpolator());
         circleAnimator.addListener(new AnimatorListenerAdapter() {
@@ -89,7 +89,7 @@ public class AnimatorUtils {
 
     public static Animator linesAnimator(TagViewGroup target) {
         ObjectAnimator animator = ObjectAnimator.ofFloat(target, "LinesRatio", 0, 1);
-        animator.setDuration(500);
+        animator.setDuration(300);
         animator.setInterpolator(new DecelerateInterpolator());
         return animator;
     }
