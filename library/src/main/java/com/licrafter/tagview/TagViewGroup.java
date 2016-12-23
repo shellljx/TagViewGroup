@@ -24,9 +24,8 @@ public class TagViewGroup extends ViewGroup {
 
     public static final int DEFAULT_RADIUS = 8;//默认外圆半径
     public static final int DEFAULT_INNER_RADIUS = 4;//默认内圆半径
-    public static final int DEFAULT_V_DISTANCE = 20;
-    public static final int DEFAULT_H_DISTANCE = 0;
-    public static final int DEFAULT_TILT_DIFF = 10;
+    public static final int DEFAULT_V_DISTANCE = 28;//默认竖直(上/下)方向线条长度
+    public static final int DEFAULT_TILT_DISTANCE = 20;//默认斜线长度
     public static final int DEFAULT_BODER_WIDTH = 1;//默认线宽
 
     private Paint mPaint;
@@ -39,9 +38,8 @@ public class TagViewGroup extends ViewGroup {
     private Context mContext;
     private int mRadius;//外圆半径
     private int mInnerRadius;//内圆半径
-    private int mTiltDiff;//斜线偏移量
-    private int mVTagDistance;//竖直方向上 TagView 与外圆边的距离
-    private int mHTagDistance;//水平方向上 TagView 与外圆边的距离
+    private int mTDistance;//斜线长度
+    private int mVTagDistance;//竖直(上/下)方向线条长度
     private int[] mChildUsed;
     private int mCenterX;//圆心 X 坐标
     private int mCenterY;//圆心 Y 坐标
@@ -63,9 +61,8 @@ public class TagViewGroup extends ViewGroup {
         mContext = context;
         mRadius = DipConvertUtils.dip2px(mContext, DEFAULT_RADIUS);
         mInnerRadius = DipConvertUtils.dip2px(mContext, DEFAULT_INNER_RADIUS);
-        mTiltDiff = DipConvertUtils.dip2px(mContext, DEFAULT_TILT_DIFF);
+        mTDistance = DipConvertUtils.dip2px(mContext, DEFAULT_TILT_DISTANCE);
         mVTagDistance = DipConvertUtils.dip2px(mContext, DEFAULT_V_DISTANCE);
-        mHTagDistance = DipConvertUtils.dip2px(mContext, DEFAULT_H_DISTANCE);
         mBoderWidth = DipConvertUtils.dip2px(mContext, DEFAULT_BODER_WIDTH);
         mPaint = new Paint();
         mPath = new Path();
@@ -79,10 +76,10 @@ public class TagViewGroup extends ViewGroup {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         measureChildren(widthMeasureSpec, heightMeasureSpec);
         mChildUsed = getChildUsed();
-        mCenterX = mChildUsed[0] + mRadius;
-        mCenterY = mChildUsed[1] + mRadius;
-        int widthSize = (mChildUsed[0] + mChildUsed[2] + mRadius * 2);
-        int heightSize = (mChildUsed[1] + mChildUsed[3] + mBoderWidth + mRadius * 2);
+        mCenterX = mChildUsed[0];
+        mCenterY = mChildUsed[1];
+        int widthSize = (mChildUsed[0] + mChildUsed[2]);
+        int heightSize = (mChildUsed[1] + mChildUsed[3] + mBoderWidth);
         setMeasuredDimension(MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.AT_MOST));
     }
 
@@ -93,81 +90,102 @@ public class TagViewGroup extends ViewGroup {
      */
     private int[] getChildUsed() {
         int childCount = getChildCount();
-        int leftMax = mRadius, topMax = mRadius, rightMax = mRadius, bottomMax = mRadius;
+        int leftMax = mRadius * 2, topMax = mRadius * 2, rightMax = mRadius * 2, bottomMax = mRadius * 2;
 
         for (int i = 0; i < childCount; i++) {
             ITagView child = (ITagView) getChildAt(i);
             switch (child.getDirection()) {
-                case RIGHT_TOP://右上
-                    rightMax = Math.max(rightMax, child.getMeasuredWidth() + mHTagDistance);
-                    topMax = Math.max(topMax, child.getMeasuredHeight() + mVTagDistance);
-                    break;
                 case RIGHT_TOP_TILT://右上斜线
-
+                    rightMax = Math.max(rightMax, mTDistance + child.getMeasuredWidth());
+                    topMax = Math.max(topMax, child.getMeasuredHeight() + mTDistance);
+                    break;
+                case RIGHT_TOP://右上
+                    rightMax = Math.max(rightMax, child.getMeasuredWidth());
+                    topMax = Math.max(topMax, child.getMeasuredHeight() + mVTagDistance);
                     break;
                 case RIGHT_CENTER://右中
-                    rightMax = Math.max(rightMax, child.getMeasuredWidth() + mHTagDistance);
-                    topMax = Math.max(topMax, child.getMeasuredHeight() - mRadius);
+                    rightMax = Math.max(rightMax, child.getMeasuredWidth());
+                    topMax = Math.max(topMax, Math.max(mVTagDistance, child.getMeasuredHeight()));
                     break;
                 case RIGHT_BOTTOM://右下
-                case RIGHT_BOTTOM_TILT://右下斜线
-                    rightMax = Math.max(rightMax, child.getMeasuredWidth() + mHTagDistance);
+                    rightMax = Math.max(rightMax, child.getMeasuredWidth());
                     bottomMax = mVTagDistance;
+                    break;
+                case RIGHT_BOTTOM_TILT:
+                    rightMax = Math.max(rightMax, mTDistance + child.getMeasuredWidth());
+                    bottomMax = mTDistance;
                     break;
                 case LEFT_TOP://左上
-                case LEFT_TOP_TILT://左上斜线
-                    leftMax = Math.max(leftMax, child.getMeasuredWidth() + mHTagDistance);
+                    leftMax = Math.max(leftMax, child.getMeasuredWidth());
                     topMax = Math.max(topMax, child.getMeasuredHeight() + mVTagDistance);
                     break;
+                case LEFT_TOP_TILT://左上斜线
+                    leftMax = Math.max(leftMax, child.getMeasuredWidth() + mTDistance);
+                    topMax = Math.max(topMax, child.getMeasuredHeight() + mTDistance);
+                    break;
                 case LEFT_CENTER://左中
-                    leftMax = Math.max(leftMax, child.getMeasuredWidth() + mHTagDistance);
-                    topMax = Math.max(topMax, child.getMeasuredHeight() - mRadius);
+                    leftMax = Math.max(leftMax, child.getMeasuredWidth());
+                    topMax = Math.max(topMax, Math.max(mVTagDistance, child.getMeasuredHeight()));
                     break;
                 case LEFT_BOTTOM://左下
-                case LEFT_BOTTOM_TILE://左下斜线
-                    leftMax = Math.max(leftMax, child.getMeasuredWidth() + mHTagDistance);
+                    leftMax = Math.max(leftMax, child.getMeasuredWidth());
                     bottomMax = mVTagDistance;
                     break;
+                case LEFT_BOTTOM_TILT://左下斜线
+                    leftMax = Math.max(leftMax, child.getMeasuredWidth() + mTDistance);
+                    bottomMax = mTDistance;
+                    break;
             }
+
         }
         return new int[]{leftMax, topMax, rightMax, bottomMax};
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int rightChildStartX = mCenterX + mRadius + mHTagDistance;
-        int leftChildEndX = mCenterX - mRadius - mHTagDistance;
         int left = 0, top = 0;
         for (int i = 0; i < getChildCount(); i++) {
             ITagView child = (ITagView) getChildAt(i);
             switch (child.getDirection()) {
                 case RIGHT_TOP_TILT://右上斜线
+                    top = 0;
+                    left = mCenterX + mTDistance;
+                    break;
                 case RIGHT_TOP://右上
-                    left = rightChildStartX;
+                    left = mCenterX;
                     top = 0;
                     break;
                 case RIGHT_CENTER://右中
-                    left = rightChildStartX;
+                    left = mCenterX;
                     top = mCenterY - child.getMeasuredHeight();
                     break;
                 case RIGHT_BOTTOM://右下
+                    left = mCenterX;
+                    top = getMeasuredHeight() - child.getMeasuredHeight() - mBoderWidth;
+                    break;
                 case RIGHT_BOTTOM_TILT://右下斜线
-                    left = rightChildStartX;
-                    top = getMeasuredHeight() - child.getMeasuredHeight();
+                    left = mCenterX + mTDistance;
+                    top = getMeasuredHeight() - child.getMeasuredHeight() - mBoderWidth;
                     break;
                 case LEFT_TOP://左上
+                    left = mCenterX - child.getMeasuredWidth();
+                    top = 0;
+                    break;
                 case LEFT_TOP_TILT://左上斜线
-                    left = leftChildEndX - child.getMeasuredWidth();
+                    left = mCenterX - child.getMeasuredWidth() - mTDistance;
                     top = 0;
                     break;
                 case LEFT_CENTER://左中
-                    left = leftChildEndX - child.getMeasuredWidth();
+                    left = mCenterX - child.getMeasuredWidth();
                     top = mCenterY - child.getMeasuredHeight();
                     break;
                 case LEFT_BOTTOM://左下
-                case LEFT_BOTTOM_TILE://左下斜线
-                    left = leftChildEndX - child.getMeasuredWidth();
-                    top = getMeasuredHeight() - child.getMeasuredHeight();
+                    left = mCenterX - child.getMeasuredWidth();
+                    top = getMeasuredHeight() - child.getMeasuredHeight() - mBoderWidth;
+                    break;
+                case LEFT_BOTTOM_TILT://左下斜线
+                    left = mCenterX - child.getMeasuredWidth() - mTDistance;
+                    top = getMeasuredHeight() - child.getMeasuredHeight() - mBoderWidth;
                     break;
             }
             child.layout(left, top, left + child.getMeasuredWidth(), top + child.getMeasuredHeight());
@@ -209,38 +227,20 @@ public class TagViewGroup extends ViewGroup {
             mDstPath.moveTo(0, 0);
             switch (child.getDirection()) {
                 case RIGHT_TOP://右上
-                    mPath.lineTo(mCenterX, child.getBottom());
-                    mPath.lineTo(child.getRight(), child.getBottom());
-                    break;
-                case RIGHT_TOP_TILT:
-                    mPath.lineTo(child.getLeft(), child.getBottom());
-                    mPath.lineTo(child.getRight(), child.getBottom());
-                    break;
-                case RIGHT_CENTER://右中
-                    mPath.lineTo(child.getRight(), mCenterY);
-                    break;
                 case RIGHT_BOTTOM://右下
-                    mPath.lineTo(mCenterX, getMeasuredHeight() - mBoderWidth);
-                    mPath.lineTo(child.getRight(), getMeasuredHeight() - mBoderWidth);
-                    break;
+                case RIGHT_TOP_TILT://右上斜线
                 case RIGHT_BOTTOM_TILT://右下斜线
+                    mPath.lineTo(child.getLeft(), child.getBottom());
+                case RIGHT_CENTER://右中
+                    mPath.lineTo(child.getRight(), child.getBottom());
                     break;
                 case LEFT_TOP://左上
-                    mPath.lineTo(mCenterX, child.getMeasuredHeight());
-                    mPath.lineTo(child.getLeft(), child.getMeasuredHeight());
-                    break;
                 case LEFT_TOP_TILT://左上斜线
-                    break;
-                case LEFT_CENTER://左中
-                    mPath.lineTo(child.getLeft(), mCenterY);
-                    break;
                 case LEFT_BOTTOM://左下
-                    mPath.lineTo(mCenterX, getMeasuredHeight() - mBoderWidth);
-                    mPath.lineTo(child.getLeft(), getMeasuredHeight() - mBoderWidth);
-                    break;
-                case LEFT_BOTTOM_TILE://左下斜线
-                    mPath.lineTo(child.getRight(), getMeasuredHeight() - mBoderWidth);
-                    mPath.lineTo(child.getLeft(), getMeasuredHeight() - mBoderWidth);
+                case LEFT_BOTTOM_TILT://左下斜线
+                    mPath.lineTo(child.getRight(), child.getBottom());
+                case LEFT_CENTER://左中
+                    mPath.lineTo(child.getLeft(), child.getBottom());
                     break;
             }
             mPathMeasure.setPath(mPath, false);
