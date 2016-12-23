@@ -14,19 +14,19 @@ import com.licrafter.tagview.utils.DipConvertUtils;
  * author: shell
  * date 2016/12/20 下午3:43
  **/
-public class TagView extends TextView implements ITagView {
+public class TagTextView extends TextView implements ITagView {
 
     private DIRECTION mDirection;
 
-    public TagView(Context context) {
+    public TagTextView(Context context) {
         this(context, null);
     }
 
-    public TagView(Context context, AttributeSet attrs) {
+    public TagTextView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public TagView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public TagTextView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setTextColor(Color.WHITE);
         setTextSize(13);

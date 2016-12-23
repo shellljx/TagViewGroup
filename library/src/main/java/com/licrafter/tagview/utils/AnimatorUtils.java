@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
 import com.licrafter.tagview.TagViewGroup;
@@ -15,7 +16,7 @@ import com.licrafter.tagview.TagViewGroup;
 public class AnimatorUtils {
 
     public static void showTagGroup(final TagViewGroup target) {
-        target.setAlpha(1);
+        target.setVisibility(View.VISIBLE);
         Animator circleAnimator = circleRadiusAnimator(target);
         final Animator linesAnimator = linesAnimator(target);
         final Animator alphaAnimator = showTagTextAnimator(target);
@@ -73,7 +74,7 @@ public class AnimatorUtils {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                target.setAlpha(0);
+                target.setVisibility(View.INVISIBLE);
                 target.setHiden(true);
             }
         });

@@ -7,11 +7,12 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.licrafter.tagview.utils.AnimatorUtils;
 import com.licrafter.tagview.utils.DipConvertUtils;
-import com.licrafter.tagview.views.TagView;
+import com.licrafter.tagview.views.ITagView;
 
 /**
  * author: shell
@@ -79,12 +80,17 @@ public class TagViewGroup extends ViewGroup {
         setMeasuredDimension(MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.AT_MOST));
     }
 
+    /**
+     * 获取中心圆上下左右各个方向的宽度
+     *
+     * @return int[]{left,top,right,bottom}
+     */
     private int[] getChildUsed() {
         int childCount = getChildCount();
-        int leftMax = 0, topMax = 0, rightMax = 0, bottomMax = 0;
+        int leftMax = mRadius, topMax = mRadius, rightMax = mRadius, bottomMax = mRadius;
 
         for (int i = 0; i < childCount; i++) {
-            TagView child = (TagView) getChildAt(i);
+            ITagView child = (ITagView) getChildAt(i);
             switch (child.getDirection()) {
                 case RIGHT_TOP://右上
                 case RIGHT_TOP_TILT://右上斜线
@@ -118,21 +124,16 @@ public class TagViewGroup extends ViewGroup {
                     break;
             }
         }
-        leftMax = leftMax == 0 ? mRadius : leftMax;
-        topMax = topMax == 0 ? mRadius : topMax;
-        rightMax = rightMax == 0 ? mRadius : rightMax;
-        bottomMax = bottomMax == 0 ? mRadius : bottomMax;
         return new int[]{leftMax, topMax, rightMax, bottomMax};
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        android.util.Log.d("ljx", "onlayout");
         int rightChildStartX = mCenterX + mRadius + mHTagDistance;
         int leftChildEndX = mCenterX - mRadius - mHTagDistance;
         int left = 0, top = 0;
         for (int i = 0; i < getChildCount(); i++) {
-            TagView child = (TagView) getChildAt(i);
+            ITagView child = (ITagView) getChildAt(i);
             switch (child.getDirection()) {
                 case RIGHT_TOP_TILT://右上斜线
                 case RIGHT_TOP://右上
@@ -196,7 +197,7 @@ public class TagViewGroup extends ViewGroup {
         mPaint.setStyle(Paint.Style.STROKE);
 
         for (int i = 0; i < getChildCount(); i++) {
-            TagView child = (TagView) getChildAt(i);
+            ITagView child = (ITagView) getChildAt(i);
             mPath.reset();
             mPath.moveTo(mCenterX, mCenterY);
             mDstPath.reset();
@@ -251,25 +252,40 @@ public class TagViewGroup extends ViewGroup {
         AnimatorUtils.hideTagGroup(this);
     }
 
-    public TagViewGroup addTag(TagView tag) {
-        addView(tag);
+    public TagViewGroup addTag(ITagView tag) {
+        addView((View) tag);
         return this;
     }
 
-    public void refreshChildDirection(TagView child) {
+    public void refreshChildDirection(ITagView child) {
     }
 
+    /**
+     * 属性 CircleRadius 的属性动画调用，设置中心圆的半径
+     *
+     * @param radius
+     */
     public void setCircleRadius(int radius) {
         mInnerRadius = radius;
         mRadius = mInnerRadius + DipConvertUtils.dip2px(mContext, 4);
         invalidate();
     }
 
+    /**
+     * 属性 LinesRatio 的属性动画调用，设置线条显示比例
+     *
+     * @param ratio
+     */
     public void setLinesRatio(float ratio) {
         mLinesRatio = ratio;
         invalidate();
     }
 
+    /**
+     * 属性 TagAlpha 的属性动画调用，设置Tag的透明度
+     *
+     * @param alpha
+     */
     public void setTagAlpha(float alpha) {
         drawTagAlpha(alpha);
     }
