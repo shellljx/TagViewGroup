@@ -15,87 +15,40 @@ import com.licrafter.tagview.TagViewGroup;
  **/
 public class AnimatorUtils {
 
-    public static void showTagGroup(final TagViewGroup target) {
-        target.setVisibility(View.VISIBLE);
-        Animator circleAnimator = circleRadiusAnimator(target);
-        final Animator linesAnimator = linesAnimator(target);
-        final Animator alphaAnimator = showTagTextAnimator(target);
-        circleAnimator.start();
-        circleAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                linesAnimator.start();
-            }
-
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-            }
-        });
-        linesAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                alphaAnimator.start();
-            }
-        });
-        alphaAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                target.setHiden(false);
-            }
-        });
+    public static Animator getTagShowAnimator(final TagViewGroup target) {
+        AnimatorSet set = new AnimatorSet();
+        set.playSequentially(circleRadiusAnimator(target), linesAnimator(target), tagTextAnimator(target));
+        return set;
     }
 
-    public static void hideTagGroup(final TagViewGroup target) {
-        final AnimatorSet set = new AnimatorSet();
+    public static Animator getTagHideAnimator(final TagViewGroup target) {
+        AnimatorSet together = new AnimatorSet();
+        AnimatorSet sequential = new AnimatorSet();
         ObjectAnimator linesAnimator = ObjectAnimator.ofFloat(target, "LinesRatio", 1, 0);
         ObjectAnimator tagTextAnimator = ObjectAnimator.ofFloat(target, "TagAlpha", 1, 0);
         Animator circleAnimator = circleRadiusAnimator(target);
-        set.playTogether(linesAnimator, tagTextAnimator);
-        set.setDuration(400);
-        set.setTarget(target);
-        set.setInterpolator(new DecelerateInterpolator());
-        circleAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                set.start();
-            }
-        });
-        set.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                target.setVisibility(View.INVISIBLE);
-                target.setHiden(true);
-            }
-        });
-        circleAnimator.start();
+        together.playTogether(linesAnimator, tagTextAnimator);
+        together.setDuration(400);
+        together.setInterpolator(new DecelerateInterpolator());
+        sequential.playSequentially(circleAnimator, together);
+        return sequential;
     }
 
-    public static Animator showTagTextAnimator(TagViewGroup target) {
+    private static Animator tagTextAnimator(TagViewGroup target) {
         ObjectAnimator animator = ObjectAnimator.ofFloat(target, "TagAlpha", 0, 1);
         animator.setDuration(200);
         animator.setInterpolator(new DecelerateInterpolator());
         return animator;
     }
 
-    public static Animator linesAnimator(TagViewGroup target) {
+    private static Animator linesAnimator(TagViewGroup target) {
         ObjectAnimator animator = ObjectAnimator.ofFloat(target, "LinesRatio", 0, 1);
         animator.setDuration(300);
         animator.setInterpolator(new DecelerateInterpolator());
         return animator;
     }
 
-    public static Animator circleRadiusAnimator(TagViewGroup target) {
+    private static Animator circleRadiusAnimator(TagViewGroup target) {
         int defaultRadius = DipConvertUtils.dip2px(target.getContext(), TagViewGroup.DEFAULT_INNER_RADIUS);
         ObjectAnimator animator = ObjectAnimator.ofInt(target, "CircleRadius",
                 defaultRadius - 10, defaultRadius + 10, defaultRadius);

@@ -1,16 +1,18 @@
 package com.licrafter.tagview;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.licrafter.tagview.utils.AnimatorUtils;
 import com.licrafter.tagview.utils.DipConvertUtils;
 import com.licrafter.tagview.views.ITagView;
 
@@ -20,16 +22,18 @@ import com.licrafter.tagview.views.ITagView;
  **/
 public class TagViewGroup extends ViewGroup {
 
-    public static final int DEFAULT_RADIUS = 8;
-    public static final int DEFAULT_INNER_RADIUS = 4;
+    public static final int DEFAULT_RADIUS = 8;//默认外圆半径
+    public static final int DEFAULT_INNER_RADIUS = 4;//默认内圆半径
     public static final int DEFAULT_V_DISTANCE = 25;
     public static final int DEFAULT_H_DISTANCE = 0;
-    public static final int DEFAULT_BODER_WIDTH = 1;
+    public static final int DEFAULT_BODER_WIDTH = 1;//默认线宽
 
     private Paint mPaint;
     private Path mPath;
     private Path mDstPath;
     private PathMeasure mPathMeasure;
+    private Animator mShowAnimator;
+    private Animator mHideAnimator;
 
     private Context mContext;
     private int mRadius;
@@ -70,7 +74,6 @@ public class TagViewGroup extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        android.util.Log.d("ljx", "onmeasure");
         measureChildren(widthMeasureSpec, heightMeasureSpec);
         mChildUsed = getChildUsed();
         mCenterX = mChildUsed[0] + mRadius;
@@ -171,7 +174,6 @@ public class TagViewGroup extends ViewGroup {
     @Override
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
-        android.util.Log.d("ljx", "ondispatchdraw");
         //绘制折线
         drawLines(canvas);
         //绘制内圆
@@ -245,15 +247,52 @@ public class TagViewGroup extends ViewGroup {
     }
 
     public void showWithAnimation() {
-        AnimatorUtils.showTagGroup(this);
+        if (checkAnimating()) {
+            return;
+        }
+        setVisibility(View.VISIBLE);
+        mShowAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                setHiden(false);
+            }
+        });
+        mShowAnimator.start();
     }
 
     public void hideWithAnimation() {
-        AnimatorUtils.hideTagGroup(this);
+        if (checkAnimating()) {
+            return;
+        }
+        mHideAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                setVisibility(INVISIBLE);
+                setHiden(true);
+            }
+        });
+        mHideAnimator.start();
     }
 
-    public TagViewGroup addTag(ITagView tag) {
+    private boolean checkAnimating() {
+        return mShowAnimator == null || mHideAnimator == null
+                || mShowAnimator.isRunning() || mHideAnimator.isRunning();
+    }
+
+    public TagViewGroup addTag(@NonNull ITagView tag) {
         addView((View) tag);
+        return this;
+    }
+
+    public TagViewGroup setShowAnimator(Animator animator) {
+        mShowAnimator = animator;
+        return this;
+    }
+
+    public TagViewGroup setHideAnimator(Animator animator) {
+        mHideAnimator = animator;
         return this;
     }
 
@@ -262,8 +301,6 @@ public class TagViewGroup extends ViewGroup {
 
     /**
      * 属性 CircleRadius 的属性动画调用，设置中心圆的半径
-     *
-     * @param radius
      */
     public void setCircleRadius(int radius) {
         mInnerRadius = radius;
@@ -273,8 +310,6 @@ public class TagViewGroup extends ViewGroup {
 
     /**
      * 属性 LinesRatio 的属性动画调用，设置线条显示比例
-     *
-     * @param ratio
      */
     public void setLinesRatio(float ratio) {
         mLinesRatio = ratio;
@@ -283,8 +318,6 @@ public class TagViewGroup extends ViewGroup {
 
     /**
      * 属性 TagAlpha 的属性动画调用，设置Tag的透明度
-     *
-     * @param alpha
      */
     public void setTagAlpha(float alpha) {
         drawTagAlpha(alpha);
