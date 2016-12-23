@@ -13,11 +13,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"/>
+        android:layout_marginTop="50dp"/>
+
+    <com.licrafter.tagview.TagViewGroup
+        android:id="@+id/tagGroup3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tagGroup2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"/>
 
     <com.licrafter.tagview.TagViewGroup
         android:id="@+id/tagGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        android:layout_below="@+id/tagGroup3"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"/>
 </RelativeLayout>
