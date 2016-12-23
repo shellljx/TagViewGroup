@@ -24,8 +24,9 @@ public class TagViewGroup extends ViewGroup {
 
     public static final int DEFAULT_RADIUS = 8;//默认外圆半径
     public static final int DEFAULT_INNER_RADIUS = 4;//默认内圆半径
-    public static final int DEFAULT_V_DISTANCE = 25;
+    public static final int DEFAULT_V_DISTANCE = 20;
     public static final int DEFAULT_H_DISTANCE = 0;
+    public static final int DEFAULT_TILT_DIFF = 10;
     public static final int DEFAULT_BODER_WIDTH = 1;//默认线宽
 
     private Paint mPaint;
@@ -36,14 +37,15 @@ public class TagViewGroup extends ViewGroup {
     private Animator mHideAnimator;
 
     private Context mContext;
-    private int mRadius;
-    private int mInnerRadius;
-    private int mVTagDistance;//竖直方向上TagView与外圆边的距离
-    private int mHTagDistance;//水平方向上TagView与外圆边的距离
+    private int mRadius;//外圆半径
+    private int mInnerRadius;//内圆半径
+    private int mTiltDiff;//斜线偏移量
+    private int mVTagDistance;//竖直方向上 TagView 与外圆边的距离
+    private int mHTagDistance;//水平方向上 TagView 与外圆边的距离
     private int[] mChildUsed;
-    private int mCenterX;
-    private int mCenterY;
-    private int mBoderWidth;
+    private int mCenterX;//圆心 X 坐标
+    private int mCenterY;//圆心 Y 坐标
+    private int mBoderWidth;//线条宽度
     private boolean mIsHiden;
 
     private float mLinesRatio = 1;
@@ -61,6 +63,7 @@ public class TagViewGroup extends ViewGroup {
         mContext = context;
         mRadius = DipConvertUtils.dip2px(mContext, DEFAULT_RADIUS);
         mInnerRadius = DipConvertUtils.dip2px(mContext, DEFAULT_INNER_RADIUS);
+        mTiltDiff = DipConvertUtils.dip2px(mContext, DEFAULT_TILT_DIFF);
         mVTagDistance = DipConvertUtils.dip2px(mContext, DEFAULT_V_DISTANCE);
         mHTagDistance = DipConvertUtils.dip2px(mContext, DEFAULT_H_DISTANCE);
         mBoderWidth = DipConvertUtils.dip2px(mContext, DEFAULT_BODER_WIDTH);
@@ -96,14 +99,15 @@ public class TagViewGroup extends ViewGroup {
             ITagView child = (ITagView) getChildAt(i);
             switch (child.getDirection()) {
                 case RIGHT_TOP://右上
-                case RIGHT_TOP_TILT://右上斜线
                     rightMax = Math.max(rightMax, child.getMeasuredWidth() + mHTagDistance);
                     topMax = Math.max(topMax, child.getMeasuredHeight() + mVTagDistance);
                     break;
+                case RIGHT_TOP_TILT://右上斜线
+
+                    break;
                 case RIGHT_CENTER://右中
                     rightMax = Math.max(rightMax, child.getMeasuredWidth() + mHTagDistance);
-                    int diffRight = child.getMeasuredHeight() - mRadius;
-                    topMax = Math.max(topMax, diffRight > 0 ? diffRight : 0);
+                    topMax = Math.max(topMax, child.getMeasuredHeight() - mRadius);
                     break;
                 case RIGHT_BOTTOM://右下
                 case RIGHT_BOTTOM_TILT://右下斜线
@@ -117,8 +121,7 @@ public class TagViewGroup extends ViewGroup {
                     break;
                 case LEFT_CENTER://左中
                     leftMax = Math.max(leftMax, child.getMeasuredWidth() + mHTagDistance);
-                    int diffLeft = child.getMeasuredHeight() - mRadius;
-                    topMax = Math.max(topMax, diffLeft > 0 ? diffLeft : 0);
+                    topMax = Math.max(topMax, child.getMeasuredHeight() - mRadius);
                     break;
                 case LEFT_BOTTOM://左下
                 case LEFT_BOTTOM_TILE://左下斜线
@@ -247,33 +250,16 @@ public class TagViewGroup extends ViewGroup {
     }
 
     public void showWithAnimation() {
-        if (checkAnimating()) {
-            return;
+        if (!checkAnimating()) {
+            setVisibility(View.VISIBLE);
+            mShowAnimator.start();
         }
-        setVisibility(View.VISIBLE);
-        mShowAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                setHiden(false);
-            }
-        });
-        mShowAnimator.start();
     }
 
     public void hideWithAnimation() {
-        if (checkAnimating()) {
-            return;
+        if (!checkAnimating()) {
+            mHideAnimator.start();
         }
-        mHideAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                setVisibility(INVISIBLE);
-                setHiden(true);
-            }
-        });
-        mHideAnimator.start();
     }
 
     private boolean checkAnimating() {
@@ -288,11 +274,26 @@ public class TagViewGroup extends ViewGroup {
 
     public TagViewGroup setShowAnimator(Animator animator) {
         mShowAnimator = animator;
+        mShowAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                setHiden(false);
+            }
+        });
         return this;
     }
 
     public TagViewGroup setHideAnimator(Animator animator) {
         mHideAnimator = animator;
+        mHideAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                setVisibility(INVISIBLE);
+                setHiden(true);
+            }
+        });
         return this;
     }
 

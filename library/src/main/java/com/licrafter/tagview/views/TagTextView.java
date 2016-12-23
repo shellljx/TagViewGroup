@@ -31,8 +31,8 @@ public class TagTextView extends TextView implements ITagView {
         setTextColor(Color.WHITE);
         setTextSize(13);
         setShadowLayer(7, 0, 0, Color.BLACK);
-        setPadding(DipConvertUtils.dip2px(getContext(), 5), DipConvertUtils.dip2px(getContext(), 2)
-                , DipConvertUtils.dip2px(getContext(), 5), DipConvertUtils.dip2px(getContext(), 2));
+        setPadding(DipConvertUtils.dip2px(getContext(), 8), DipConvertUtils.dip2px(getContext(), 2)
+                , DipConvertUtils.dip2px(getContext(), 8), DipConvertUtils.dip2px(getContext(), 2));
     }
 
     @Override
