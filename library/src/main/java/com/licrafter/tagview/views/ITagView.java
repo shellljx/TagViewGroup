@@ -3,29 +3,30 @@ package com.licrafter.tagview.views;
 import com.licrafter.tagview.DIRECTION;
 
 /**
- * Created by lijx on 2016/12/22.
- */
+ * author: shell
+ * date 2016/12/22 下午1:04
+ **/
 
 public interface ITagView {
 
     //设置Tag的方向
-    public void setDirection(DIRECTION direction);
+     void setDirection(DIRECTION direction);
 
     //得到Tag的方向
-    public DIRECTION getDirection();
+     DIRECTION getDirection();
 
-    public int getMeasuredWidth();
+     int getMeasuredWidth();
 
-    public int getMeasuredHeight();
+     int getMeasuredHeight();
 
-    public int getTop();
+     int getTop();
 
-    public int getLeft();
+     int getLeft();
 
-    public int getRight();
+     int getRight();
 
-    public int getBottom();
+     int getBottom();
 
-    public void layout(int left, int top, int right, int bottom);
+     void layout(int left, int top, int right, int bottom);
 
 }
