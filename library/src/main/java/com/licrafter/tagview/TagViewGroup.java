@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
+import android.graphics.Point;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 
 import com.licrafter.tagview.utils.DipConvertUtils;
 import com.licrafter.tagview.views.ITagView;
+import com.licrafter.tagview.views.RippleView;
 
 /**
  * author: shell
@@ -35,7 +37,7 @@ public class TagViewGroup extends ViewGroup {
     private Animator mShowAnimator;
     private Animator mHideAnimator;
 
-    private Context mContext;
+    private RippleView mRippleView;
     private int mRadius;//外圆半径
     private int mInnerRadius;//内圆半径
     private int mTDistance;//斜线长度
@@ -60,12 +62,11 @@ public class TagViewGroup extends ViewGroup {
 
     public TagViewGroup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mContext = context;
-        mRadius = DipConvertUtils.dip2px(mContext, DEFAULT_RADIUS);
-        mInnerRadius = DipConvertUtils.dip2px(mContext, DEFAULT_INNER_RADIUS);
-        mTDistance = DipConvertUtils.dip2px(mContext, DEFAULT_TILT_DISTANCE);
-        mVDistance = DipConvertUtils.dip2px(mContext, DEFAULT_V_DISTANCE);
-        mBoderWidth = DipConvertUtils.dip2px(mContext, DEFAULT_BODER_WIDTH);
+        mRadius = DipConvertUtils.dip2px(context, DEFAULT_RADIUS);
+        mInnerRadius = DipConvertUtils.dip2px(context, DEFAULT_INNER_RADIUS);
+        mTDistance = DipConvertUtils.dip2px(context, DEFAULT_TILT_DISTANCE);
+        mVDistance = DipConvertUtils.dip2px(context, DEFAULT_V_DISTANCE);
+        mBoderWidth = DipConvertUtils.dip2px(context, DEFAULT_BODER_WIDTH);
         mPaint = new Paint();
         mPath = new Path();
         mDstPath = new Path();
@@ -82,6 +83,9 @@ public class TagViewGroup extends ViewGroup {
         //园中心默认在左上角 (0,0)
         mCenterX = (int) (getMeasuredWidth() * mPercentX);
         mCenterY = (int) (getMeasuredHeight() * mPercentY);
+        if (mRippleView != null) {
+            mRippleView.setCenterPoint(mCenterX,mCenterY);
+        }
     }
 
     /**
@@ -91,7 +95,7 @@ public class TagViewGroup extends ViewGroup {
      */
     private int[] getChildUsed() {
         int childCount = getChildCount();
-        int leftMax = mRadius * 2, topMax = mRadius * 2, rightMax = mRadius * 2, bottomMax = mRadius * 2;
+        int leftMax = mVDistance, topMax = mVDistance, rightMax = mVDistance, bottomMax = mVDistance;
 
         for (int i = 0; i < childCount; i++) {
             ITagView child = (ITagView) getChildAt(i);
@@ -188,6 +192,10 @@ public class TagViewGroup extends ViewGroup {
                     left = mCenterX - child.getMeasuredWidth() - mTDistance;
                     top = mVDistance + mCenterY - child.getMeasuredHeight();
                     break;
+                case CENTER:
+                    left = 0;
+                    top = 0;
+                    break;
             }
             child.layout(left, top, left + child.getMeasuredWidth(), top + child.getMeasuredHeight());
         }
@@ -272,6 +280,13 @@ public class TagViewGroup extends ViewGroup {
         return this;
     }
 
+    public void addRipple() {
+        mRippleView = new RippleView(getContext());
+        mRippleView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        mRippleView.setDirection(DIRECTION.CENTER);
+        addView(mRippleView);
+    }
+
     //设置中心圆点坐标占整个 ViewGroup 的比例
     public void setPercent(float percentX, float percentY) {
         mPercentX = percentX;
@@ -311,7 +326,7 @@ public class TagViewGroup extends ViewGroup {
      */
     public void setCircleRadius(int radius) {
         mInnerRadius = radius;
-        mRadius = mInnerRadius + DipConvertUtils.dip2px(mContext, 4);
+        mRadius = mInnerRadius + DipConvertUtils.dip2px(getContext(), 4);
         invalidate();
     }
 

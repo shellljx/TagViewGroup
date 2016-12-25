@@ -29,17 +29,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mTagGroup.setShowAnimator(AnimatorUtils.getTagShowAnimator(mTagGroup))
                 .setHideAnimator(AnimatorUtils.getTagHideAnimator(mTagGroup))
-                .addTag(v1).addTag(v2).addTag(v3).addTag(v4).addTag(v5).addTag(v6);
+                .addTag(v1).addTag(v2).addTag(v3).addTag(v4).addTag(v5).addTag(v6)
+                .addRipple();
         mTagGroup.setPercent(0.5f, 0.4f);
 
         mTagGroup2.setShowAnimator(AnimatorUtils.getTagShowAnimator(mTagGroup2))
                 .setHideAnimator(AnimatorUtils.getTagHideAnimator(mTagGroup2))
-                .addTag(v7);
+                .addTag(v7).addRipple();
         mTagGroup2.setPercent(0.5f, 0.2f);
 
         mTagGroup3.setShowAnimator(AnimatorUtils.getTagShowAnimator(mTagGroup3))
                 .setHideAnimator(AnimatorUtils.getTagHideAnimator(mTagGroup3))
-                .addTag(v8).addTag(v9).addTag(v0).addTag(v10);
+                .addTag(v8).addTag(v9).addTag(v0).addTag(v10).addRipple();
         mTagGroup3.setPercent(0.5f, 0.6f);
 
         v1.setOnClickListener(this);
