@@ -39,10 +39,12 @@ public class TagViewGroup extends ViewGroup {
     private int mRadius;//外圆半径
     private int mInnerRadius;//内圆半径
     private int mTDistance;//斜线长度
-    private int mVTagDistance;//竖直(上/下)方向线条长度
+    private int mVDistance;//竖直(上/下)方向线条长度
     private int[] mChildUsed;
     private int mCenterX;//圆心 X 坐标
     private int mCenterY;//圆心 Y 坐标
+    private float mPercentX;
+    private float mPercentY;
     private int mBoderWidth;//线条宽度
     private boolean mIsHiden;
 
@@ -62,7 +64,7 @@ public class TagViewGroup extends ViewGroup {
         mRadius = DipConvertUtils.dip2px(mContext, DEFAULT_RADIUS);
         mInnerRadius = DipConvertUtils.dip2px(mContext, DEFAULT_INNER_RADIUS);
         mTDistance = DipConvertUtils.dip2px(mContext, DEFAULT_TILT_DISTANCE);
-        mVTagDistance = DipConvertUtils.dip2px(mContext, DEFAULT_V_DISTANCE);
+        mVDistance = DipConvertUtils.dip2px(mContext, DEFAULT_V_DISTANCE);
         mBoderWidth = DipConvertUtils.dip2px(mContext, DEFAULT_BODER_WIDTH);
         mPaint = new Paint();
         mPath = new Path();
@@ -74,13 +76,12 @@ public class TagViewGroup extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         measureChildren(widthMeasureSpec, heightMeasureSpec);
         mChildUsed = getChildUsed();
-        mCenterX = mChildUsed[0];
-        mCenterY = mChildUsed[1];
-        int widthSize = (mChildUsed[0] + mChildUsed[2]);
-        int heightSize = (mChildUsed[1] + mChildUsed[3] + mBoderWidth);
-        setMeasuredDimension(MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.AT_MOST));
+        //园中心默认在左上角 (0,0)
+        mCenterX = (int) (getMeasuredWidth() * mPercentX);
+        mCenterY = (int) (getMeasuredHeight() * mPercentY);
     }
 
     /**
@@ -101,15 +102,15 @@ public class TagViewGroup extends ViewGroup {
                     break;
                 case RIGHT_TOP://右上
                     rightMax = Math.max(rightMax, child.getMeasuredWidth());
-                    topMax = Math.max(topMax, child.getMeasuredHeight() + mVTagDistance);
+                    topMax = Math.max(topMax, child.getMeasuredHeight() + mVDistance);
                     break;
                 case RIGHT_CENTER://右中
                     rightMax = Math.max(rightMax, child.getMeasuredWidth());
-                    topMax = Math.max(topMax, Math.max(mVTagDistance, child.getMeasuredHeight()));
+                    topMax = Math.max(topMax, Math.max(mVDistance, child.getMeasuredHeight()));
                     break;
                 case RIGHT_BOTTOM://右下
                     rightMax = Math.max(rightMax, child.getMeasuredWidth());
-                    bottomMax = mVTagDistance;
+                    bottomMax = mVDistance;
                     break;
                 case RIGHT_BOTTOM_TILT:
                     rightMax = Math.max(rightMax, mTDistance + child.getMeasuredWidth());
@@ -117,7 +118,7 @@ public class TagViewGroup extends ViewGroup {
                     break;
                 case LEFT_TOP://左上
                     leftMax = Math.max(leftMax, child.getMeasuredWidth());
-                    topMax = Math.max(topMax, child.getMeasuredHeight() + mVTagDistance);
+                    topMax = Math.max(topMax, child.getMeasuredHeight() + mVDistance);
                     break;
                 case LEFT_TOP_TILT://左上斜线
                     leftMax = Math.max(leftMax, child.getMeasuredWidth() + mTDistance);
@@ -125,11 +126,11 @@ public class TagViewGroup extends ViewGroup {
                     break;
                 case LEFT_CENTER://左中
                     leftMax = Math.max(leftMax, child.getMeasuredWidth());
-                    topMax = Math.max(topMax, Math.max(mVTagDistance, child.getMeasuredHeight()));
+                    topMax = Math.max(topMax, Math.max(mVDistance, child.getMeasuredHeight()));
                     break;
                 case LEFT_BOTTOM://左下
                     leftMax = Math.max(leftMax, child.getMeasuredWidth());
-                    bottomMax = mVTagDistance;
+                    bottomMax = mVDistance;
                     break;
                 case LEFT_BOTTOM_TILT://左下斜线
                     leftMax = Math.max(leftMax, child.getMeasuredWidth() + mTDistance);
@@ -148,12 +149,12 @@ public class TagViewGroup extends ViewGroup {
             ITagView child = (ITagView) getChildAt(i);
             switch (child.getDirection()) {
                 case RIGHT_TOP_TILT://右上斜线
-                    top = 0;
+                    top = mCenterY - mVDistance - child.getMeasuredHeight();
                     left = mCenterX + mTDistance;
                     break;
                 case RIGHT_TOP://右上
                     left = mCenterX;
-                    top = 0;
+                    top = mCenterY - mVDistance - child.getMeasuredHeight();
                     break;
                 case RIGHT_CENTER://右中
                     left = mCenterX;
@@ -161,19 +162,19 @@ public class TagViewGroup extends ViewGroup {
                     break;
                 case RIGHT_BOTTOM://右下
                     left = mCenterX;
-                    top = getMeasuredHeight() - child.getMeasuredHeight() - mBoderWidth;
+                    top = mVDistance + mCenterY - child.getMeasuredHeight();
                     break;
                 case RIGHT_BOTTOM_TILT://右下斜线
                     left = mCenterX + mTDistance;
-                    top = getMeasuredHeight() - child.getMeasuredHeight() - mBoderWidth;
+                    top = mVDistance + mCenterY - child.getMeasuredHeight();
                     break;
                 case LEFT_TOP://左上
                     left = mCenterX - child.getMeasuredWidth();
-                    top = 0;
+                    top = mCenterY - mVDistance - child.getMeasuredHeight();
                     break;
                 case LEFT_TOP_TILT://左上斜线
                     left = mCenterX - child.getMeasuredWidth() - mTDistance;
-                    top = 0;
+                    top = mCenterY - mVDistance - child.getMeasuredHeight();
                     break;
                 case LEFT_CENTER://左中
                     left = mCenterX - child.getMeasuredWidth();
@@ -181,11 +182,11 @@ public class TagViewGroup extends ViewGroup {
                     break;
                 case LEFT_BOTTOM://左下
                     left = mCenterX - child.getMeasuredWidth();
-                    top = getMeasuredHeight() - child.getMeasuredHeight() - mBoderWidth;
+                    top = mVDistance + mCenterY - child.getMeasuredHeight();
                     break;
                 case LEFT_BOTTOM_TILT://左下斜线
                     left = mCenterX - child.getMeasuredWidth() - mTDistance;
-                    top = getMeasuredHeight() - child.getMeasuredHeight() - mBoderWidth;
+                    top = mVDistance + mCenterY - child.getMeasuredHeight();
                     break;
             }
             child.layout(left, top, left + child.getMeasuredWidth(), top + child.getMeasuredHeight());
@@ -270,6 +271,12 @@ public class TagViewGroup extends ViewGroup {
     public TagViewGroup addTag(@NonNull ITagView tag) {
         addView((View) tag);
         return this;
+    }
+
+    //设置中心圆点坐标占整个 ViewGroup 的比例
+    public void setPercent(float percentX, float percentY) {
+        mPercentX = percentX;
+        mPercentY = percentY;
     }
 
     public TagViewGroup setShowAnimator(Animator animator) {
