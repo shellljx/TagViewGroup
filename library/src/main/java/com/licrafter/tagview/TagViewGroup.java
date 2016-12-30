@@ -212,7 +212,7 @@ public class TagViewGroup extends ViewGroup {
             }
             child.layout(left, top, left + child.getMeasuredWidth(), top + child.getMeasuredHeight());
         }
-        refreshTagRect();
+        refreshTagsRect();
     }
 
     @Override
@@ -305,7 +305,7 @@ public class TagViewGroup extends ViewGroup {
         addView(mRippleView);
     }
 
-    public void refreshTagRect() {
+    private void refreshTagsRect() {
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
             if (((ITagView) child).getDirection() != DIRECTION.CENTER) {
@@ -314,7 +314,7 @@ public class TagViewGroup extends ViewGroup {
         }
     }
 
-    public boolean checkTouchTag(float x, float y) {
+    private boolean isTouchingTags(float x, float y) {
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
             if (((ITagView) child).getDirection() != DIRECTION.CENTER && mRectArray[(int) child.getTag()].contains(x, y)) {
@@ -356,12 +356,10 @@ public class TagViewGroup extends ViewGroup {
         return this;
     }
 
-    public void refreshChildDirection(ITagView child) {
-    }
-
     /**
      * 属性 CircleRadius 的属性动画调用，设置中心圆的半径
      */
+    @SuppressWarnings("unused")
     public void setCircleRadius(int radius) {
         mInnerRadius = radius;
         mRadius = mInnerRadius + DipConvertUtils.dip2px(getContext(), 4);
@@ -371,6 +369,7 @@ public class TagViewGroup extends ViewGroup {
     /**
      * 属性 LinesRatio 的属性动画调用，设置线条显示比例
      */
+    @SuppressWarnings("unused")
     public void setLinesRatio(float ratio) {
         mLinesRatio = ratio;
         invalidate();
@@ -379,6 +378,7 @@ public class TagViewGroup extends ViewGroup {
     /**
      * 属性 TagAlpha 的属性动画调用，设置Tag的透明度
      */
+    @SuppressWarnings("unused")
     public void setTagAlpha(float alpha) {
         drawTagAlpha(alpha);
     }
@@ -421,7 +421,7 @@ public class TagViewGroup extends ViewGroup {
             if (mClickListener != null) {
                 float x = e.getX();
                 float y = e.getY();
-                if (mCenterRect.contains(x, y) || checkTouchTag(x, y)) {
+                if (mCenterRect.contains(x, y) || isTouchingTags(x, y)) {
                     return true;
                 }
             }
@@ -454,7 +454,7 @@ public class TagViewGroup extends ViewGroup {
             super.onLongPress(e);
             float x = e.getX();
             float y = e.getY();
-            if (mCenterRect.contains(x, y) || checkTouchTag(x, y)) {
+            if (mCenterRect.contains(x, y) || isTouchingTags(x, y)) {
                 mClickListener.onLongPress();
             }
         }

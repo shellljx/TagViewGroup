@@ -3,11 +3,9 @@ package com.licrafter.tagview.views;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.widget.TextView;
 
 import com.licrafter.tagview.DIRECTION;
-import com.licrafter.tagview.TagViewGroup;
 import com.licrafter.tagview.utils.DipConvertUtils;
 
 /**
@@ -34,18 +32,6 @@ public class TagTextView extends TextView implements ITagView {
         setPadding(DipConvertUtils.dip2px(getContext(), 12), DipConvertUtils.dip2px(getContext(), 4)
                 , DipConvertUtils.dip2px(getContext(), 12), DipConvertUtils.dip2px(getContext(), 4));
     }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        int action = event.getAction();
-        switch (action) {
-            case MotionEvent.ACTION_UP:
-                ((TagViewGroup) getParent()).refreshChildDirection(this);
-                break;
-        }
-        return super.onTouchEvent(event);
-    }
-
 
     @Override
     public void setDirection(DIRECTION direction) {
