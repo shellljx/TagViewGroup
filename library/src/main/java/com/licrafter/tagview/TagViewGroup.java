@@ -8,15 +8,19 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
-import android.graphics.Point;
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.licrafter.tagview.utils.DipConvertUtils;
 import com.licrafter.tagview.views.ITagView;
 import com.licrafter.tagview.views.RippleView;
+
 
 /**
  * author: shell
@@ -27,7 +31,7 @@ public class TagViewGroup extends ViewGroup {
     public static final int DEFAULT_RADIUS = 8;//默认外圆半径
     public static final int DEFAULT_INNER_RADIUS = 4;//默认内圆半径
     public static final int DEFAULT_V_DISTANCE = 28;//默认竖直(上/下)方向线条长度
-    public static final int DEFAULT_TILT_DISTANCE = 20;//默认斜线长度
+    public static final int DEFAULT_TILT_DISTANCE = 15;//默认斜线长度
     public static final int DEFAULT_BODER_WIDTH = 1;//默认线宽
 
     private Paint mPaint;
@@ -36,13 +40,18 @@ public class TagViewGroup extends ViewGroup {
     private PathMeasure mPathMeasure;
     private Animator mShowAnimator;
     private Animator mHideAnimator;
+    private GestureDetectorCompat mGestureDetector;
+    private TagGroupClickListener mClickListener;
 
     private RippleView mRippleView;
     private int mRadius;//外圆半径
     private int mInnerRadius;//内圆半径
     private int mTDistance;//斜线长度
     private int mVDistance;//竖直(上/下)方向线条长度
+    private RectF mCenterRect;
+    private RectF[] mRectArray;
     private int[] mChildUsed;
+    private int mTagCount;
     private int mCenterX;//圆心 X 坐标
     private int mCenterY;//圆心 Y 坐标
     private float mPercentX;
@@ -72,7 +81,10 @@ public class TagViewGroup extends ViewGroup {
         mDstPath = new Path();
         mPathMeasure = new PathMeasure();
         mPaint.setAntiAlias(true);
+        mGestureDetector = new GestureDetectorCompat(context, new TagOnGestureListener());
         mChildUsed = new int[4];
+        mCenterRect = new RectF();
+        mRectArray = new RectF[6];
     }
 
     @Override
@@ -83,8 +95,9 @@ public class TagViewGroup extends ViewGroup {
         //园中心默认在左上角 (0,0)
         mCenterX = (int) (getMeasuredWidth() * mPercentX);
         mCenterY = (int) (getMeasuredHeight() * mPercentY);
+        mCenterRect.set(mCenterX - mRadius, mCenterY - mRadius, mCenterX + mRadius, mCenterY + mRadius);
         if (mRippleView != null) {
-            mRippleView.setCenterPoint(mCenterX,mCenterY);
+            mRippleView.setCenterPoint(mCenterX, mCenterY);
         }
     }
 
@@ -199,6 +212,7 @@ public class TagViewGroup extends ViewGroup {
             }
             child.layout(left, top, left + child.getMeasuredWidth(), top + child.getMeasuredHeight());
         }
+        refreshTagRect();
     }
 
     @Override
@@ -276,7 +290,11 @@ public class TagViewGroup extends ViewGroup {
     }
 
     public TagViewGroup addTag(@NonNull ITagView tag) {
-        addView((View) tag);
+        View tagView = ((View) tag);
+        tagView.setTag(mTagCount);
+        mRectArray[mTagCount] = new RectF();
+        addView(tagView);
+        mTagCount++;
         return this;
     }
 
@@ -287,7 +305,27 @@ public class TagViewGroup extends ViewGroup {
         addView(mRippleView);
     }
 
+    public void refreshTagRect() {
+        for (int i = 0; i < getChildCount(); i++) {
+            View child = getChildAt(i);
+            if (((ITagView) child).getDirection() != DIRECTION.CENTER) {
+                mRectArray[(int) child.getTag()].set(child.getLeft(), child.getTop(), child.getRight(), child.getBottom());
+            }
+        }
+    }
+
+    public boolean checkTouchTag(float x, float y) {
+        for (int i = 0; i < getChildCount(); i++) {
+            View child = getChildAt(i);
+            if (((ITagView) child).getDirection() != DIRECTION.CENTER && mRectArray[(int) child.getTag()].contains(x, y)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     //设置中心圆点坐标占整个 ViewGroup 的比例
+
     public void setPercent(float percentX, float percentY) {
         mPercentX = percentX;
         mPercentY = percentY;
@@ -352,5 +390,73 @@ public class TagViewGroup extends ViewGroup {
 
     public void setHiden(boolean hiden) {
         mIsHiden = hiden;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return mGestureDetector.onTouchEvent(event);
+    }
+
+    public void setTagGroupClickListener(TagGroupClickListener listener) {
+        mClickListener = listener;
+    }
+
+    public interface TagGroupClickListener {
+
+        //TagGroup 中心圆点被点击
+        void onCircleClicked();
+
+        //TagGroup Tag子view被点击
+        void onTagsClicked();
+
+        //TagGroup 被长按
+        void onLongPress();
+    }
+
+    //内部处理 touch 事件监听器
+    private class TagOnGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            if (mClickListener != null) {
+                float x = e.getX();
+                float y = e.getY();
+                if (mCenterRect.contains(x, y) || checkTouchTag(x, y)) {
+                    return true;
+                }
+            }
+            return super.onDown(e);
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            float x = e.getX();
+            float y = e.getY();
+
+            if (mCenterRect.contains(x, y)) {
+                mClickListener.onCircleClicked();
+            } else {
+                mClickListener.onTagsClicked();
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            mPercentX = (mCenterX - distanceX) / getMeasuredWidth();
+            mPercentY = (mCenterY - distanceY) / getMeasuredHeight();
+            requestLayout();
+            return true;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            super.onLongPress(e);
+            float x = e.getX();
+            float y = e.getY();
+            if (mCenterRect.contains(x, y) || checkTouchTag(x, y)) {
+                mClickListener.onLongPress();
+            }
+        }
     }
 }
