@@ -31,7 +31,7 @@ public class TagViewGroup extends ViewGroup {
     public static final int DEFAULT_RADIUS = 8;//默认外圆半径
     public static final int DEFAULT_INNER_RADIUS = 4;//默认内圆半径
     public static final int DEFAULT_V_DISTANCE = 28;//默认竖直(上/下)方向线条长度
-    public static final int DEFAULT_TILT_DISTANCE = 15;//默认斜线长度
+    public static final int DEFAULT_TILT_DISTANCE = 20;//默认斜线长度
     public static final int DEFAULT_BODER_WIDTH = 1;//默认线宽
 
     private Paint mPaint;
@@ -166,7 +166,7 @@ public class TagViewGroup extends ViewGroup {
             ITagView child = (ITagView) getChildAt(i);
             switch (child.getDirection()) {
                 case RIGHT_TOP_TILT://右上斜线
-                    top = mCenterY - mVDistance - child.getMeasuredHeight();
+                    top = mCenterY - mTDistance - child.getMeasuredHeight();
                     left = mCenterX + mTDistance;
                     break;
                 case RIGHT_TOP://右上
@@ -183,7 +183,7 @@ public class TagViewGroup extends ViewGroup {
                     break;
                 case RIGHT_BOTTOM_TILT://右下斜线
                     left = mCenterX + mTDistance;
-                    top = mVDistance + mCenterY - child.getMeasuredHeight();
+                    top = mTDistance + mCenterY - child.getMeasuredHeight();
                     break;
                 case LEFT_TOP://左上
                     left = mCenterX - child.getMeasuredWidth();
@@ -191,7 +191,7 @@ public class TagViewGroup extends ViewGroup {
                     break;
                 case LEFT_TOP_TILT://左上斜线
                     left = mCenterX - child.getMeasuredWidth() - mTDistance;
-                    top = mCenterY - mVDistance - child.getMeasuredHeight();
+                    top = mCenterY - mTDistance - child.getMeasuredHeight();
                     break;
                 case LEFT_CENTER://左中
                     left = mCenterX - child.getMeasuredWidth();
@@ -203,7 +203,7 @@ public class TagViewGroup extends ViewGroup {
                     break;
                 case LEFT_BOTTOM_TILT://左下斜线
                     left = mCenterX - child.getMeasuredWidth() - mTDistance;
-                    top = mVDistance + mCenterY - child.getMeasuredHeight();
+                    top = mTDistance + mCenterY - child.getMeasuredHeight();
                     break;
                 case CENTER:
                     left = 0;
@@ -443,8 +443,12 @@ public class TagViewGroup extends ViewGroup {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            mPercentX = (mCenterX - distanceX) / getMeasuredWidth();
-            mPercentY = (mCenterY - distanceY) / getMeasuredHeight();
+            float currentX = mCenterX - distanceX;
+            float currentY = mCenterY - distanceY;
+            currentX = Math.min(Math.max(currentX, mChildUsed[0]), getMeasuredWidth() - mChildUsed[2]);
+            currentY = Math.min(Math.max(currentY, mChildUsed[1]), getMeasuredHeight() - mChildUsed[3]);
+            mPercentX = currentX / getMeasuredWidth();
+            mPercentY = currentY / getMeasuredHeight();
             requestLayout();
             return true;
         }
