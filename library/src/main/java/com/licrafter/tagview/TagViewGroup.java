@@ -376,7 +376,7 @@ public class TagViewGroup extends ViewGroup {
     }
 
     /**
-     * 属性 TagAlpha 的属性动画调用，设置Tag的透明度
+     * 属性 TagAlpha 的属性动画调用，设置 Tag 的透明度
      */
     @SuppressWarnings("unused")
     public void setTagAlpha(float alpha) {
@@ -394,7 +394,10 @@ public class TagViewGroup extends ViewGroup {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return mGestureDetector.onTouchEvent(event);
+        if (mClickListener != null) {
+            return mGestureDetector.onTouchEvent(event);
+        }
+        return super.onTouchEvent(event);
     }
 
     public void setTagGroupClickListener(TagGroupClickListener listener) {
