@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/bg2"
+    android:orientation="vertical"
     tools:context="com.licrafter.sample.MainActivity">
 
-    <com.licrafter.tagview.TagViewGroup
-        android:id="@+id/tagGroup2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    <com.licrafter.sample.views.TagImageView
+        android:id="@+id/tagImageView"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"/>
 
-    <com.licrafter.tagview.TagViewGroup
-        android:id="@+id/tagGroup3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/refreshButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="刷新"/>
 
-    <com.licrafter.tagview.TagViewGroup
-        android:id="@+id/tagGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-</RelativeLayout>
+    <Button
+        android:id="@+id/transButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="创建标签"/>
+
+</LinearLayout>
