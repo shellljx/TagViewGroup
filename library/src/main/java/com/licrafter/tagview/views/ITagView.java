@@ -10,23 +10,29 @@ import com.licrafter.tagview.DIRECTION;
 public interface ITagView {
 
     //设置Tag的方向
-     void setDirection(DIRECTION direction);
+    void setDirection(DIRECTION direction);
 
     //得到Tag的方向
-     DIRECTION getDirection();
+    DIRECTION getDirection();
 
-     int getMeasuredWidth();
+    int getMeasuredWidth();
 
-     int getMeasuredHeight();
+    int getMeasuredHeight();
 
-     int getTop();
+    int getTop();
 
-     int getLeft();
+    int getLeft();
 
-     int getRight();
+    int getRight();
 
-     int getBottom();
+    int getBottom();
 
-     void layout(int left, int top, int right, int bottom);
+    Object getTag();
+
+    void setTag(Object tag);
+
+    void setTag(int key, Object tag);
+
+    void layout(int left, int top, int right, int bottom);
 
 }

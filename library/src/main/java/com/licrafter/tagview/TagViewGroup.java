@@ -21,6 +21,9 @@ import com.licrafter.tagview.utils.DipConvertUtils;
 import com.licrafter.tagview.views.ITagView;
 import com.licrafter.tagview.views.RippleView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * author: shell
@@ -33,6 +36,7 @@ public class TagViewGroup extends ViewGroup {
     public static final int DEFAULT_V_DISTANCE = 28;//默认竖直(上/下)方向线条长度
     public static final int DEFAULT_TILT_DISTANCE = 20;//默认斜线长度
     public static final int DEFAULT_BODER_WIDTH = 1;//默认线宽
+    public static final int DEFAULT_MAX_TAG = 6;//默认标签最大数量
 
     private Paint mPaint;
     private Path mPath;
@@ -41,7 +45,7 @@ public class TagViewGroup extends ViewGroup {
     private Animator mShowAnimator;
     private Animator mHideAnimator;
     private GestureDetectorCompat mGestureDetector;
-    private TagGroupClickListener mClickListener;
+    private OnTagGroupClickListener mClickListener;
 
     private RippleView mRippleView;
     private int mRadius;//外圆半径
@@ -289,15 +293,64 @@ public class TagViewGroup extends ViewGroup {
                 || mShowAnimator.isRunning() || mHideAnimator.isRunning();
     }
 
+    /**
+     * 添加 Tag 列表
+     *
+     * @param tagList 要添加的 Tag 列表
+     * @return 返回 标签组
+     */
+    public TagViewGroup addTagList(@NonNull List<ITagView> tagList) {
+        for (ITagView tag : tagList) {
+            addTag(tag);
+        }
+        return this;
+    }
+
+    /**
+     * 添加单个 Tag
+     *
+     * @param tag 要添加的 Tag
+     * @return 返回 标签组
+     */
     public TagViewGroup addTag(@NonNull ITagView tag) {
-        View tagView = ((View) tag);
-        tagView.setTag(mTagCount);
+        if (mTagCount >= DEFAULT_MAX_TAG) {
+            throw new RuntimeException("The number of tags exceeds the maximum value(6)");
+        }
+        tag.setTag(mTagCount);
+        addView((View) tag);
         mRectArray[mTagCount] = new RectF();
-        addView(tagView);
         mTagCount++;
         return this;
     }
 
+    /**
+     * 得到 TagViewGroup 中的所有标签列表
+     *
+     * @return
+     */
+    public List<ITagView> getTagList() {
+        List<ITagView> list = new ArrayList<>();
+        for (int i = 0; i < getChildCount(); i++) {
+            ITagView tag = (ITagView) getChildAt(i);
+            if (tag.getDirection() != DIRECTION.CENTER) {
+                list.add(tag);
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 得到 TagViewGroup 中的标签数量
+     *
+     * @return
+     */
+    public int getTagCount() {
+        return mTagCount;
+    }
+
+    /**
+     * 添加水波纹
+     */
     public void addRipple() {
         mRippleView = new RippleView(getContext());
         mRippleView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -307,21 +360,32 @@ public class TagViewGroup extends ViewGroup {
 
     private void refreshTagsRect() {
         for (int i = 0; i < getChildCount(); i++) {
-            View child = getChildAt(i);
-            if (((ITagView) child).getDirection() != DIRECTION.CENTER) {
-                mRectArray[(int) child.getTag()].set(child.getLeft(), child.getTop(), child.getRight(), child.getBottom());
+            ITagView child = (ITagView) getChildAt(i);
+            if (child.getDirection() != DIRECTION.CENTER) {
+                int index = (int) child.getTag();
+                if (mRectArray[index] == null) {
+                    mRectArray[index] = new RectF();
+                }
+                mRectArray[index].set(child.getLeft(), child.getTop(), child.getRight(), child.getBottom());
             }
         }
     }
 
-    private boolean isTouchingTags(float x, float y) {
+    /**
+     * 检测 Touch 事件发生在哪个 Tag 上
+     *
+     * @param x
+     * @param y
+     * @return
+     */
+    private ITagView isTouchingTags(float x, float y) {
         for (int i = 0; i < getChildCount(); i++) {
-            View child = getChildAt(i);
-            if (((ITagView) child).getDirection() != DIRECTION.CENTER && mRectArray[(int) child.getTag()].contains(x, y)) {
-                return true;
+            ITagView child = (ITagView) getChildAt(i);
+            if (child.getDirection() != DIRECTION.CENTER && mRectArray[(int) child.getTag()].contains(x, y)) {
+                return child;
             }
         }
-        return false;
+        return null;
     }
 
     //设置中心圆点坐标占整个 ViewGroup 的比例
@@ -400,20 +464,23 @@ public class TagViewGroup extends ViewGroup {
         return super.onTouchEvent(event);
     }
 
-    public void setTagGroupClickListener(TagGroupClickListener listener) {
+    public void setOnTagGroupClickListener(OnTagGroupClickListener listener) {
         mClickListener = listener;
     }
 
-    public interface TagGroupClickListener {
+    public interface OnTagGroupClickListener {
 
         //TagGroup 中心圆点被点击
-        void onCircleClicked();
+        void onCircleClick(TagViewGroup group);
 
         //TagGroup Tag子view被点击
-        void onTagsClicked();
+        void onTagClick(TagViewGroup group, ITagView tag, int index);
 
         //TagGroup 被长按
-        void onLongPress();
+        void onLongPress(TagViewGroup group);
+
+        //TagGroup 移动
+        void onScroll(TagViewGroup group, float percentX, float percentY);
     }
 
     //内部处理 touch 事件监听器
@@ -421,12 +488,10 @@ public class TagViewGroup extends ViewGroup {
 
         @Override
         public boolean onDown(MotionEvent e) {
-            if (mClickListener != null) {
-                float x = e.getX();
-                float y = e.getY();
-                if (mCenterRect.contains(x, y) || isTouchingTags(x, y)) {
-                    return true;
-                }
+            float x = e.getX();
+            float y = e.getY();
+            if (mCenterRect.contains(x, y) || isTouchingTags(x, y) != null) {
+                return true;
             }
             return super.onDown(e);
         }
@@ -437,9 +502,10 @@ public class TagViewGroup extends ViewGroup {
             float y = e.getY();
 
             if (mCenterRect.contains(x, y)) {
-                mClickListener.onCircleClicked();
+                mClickListener.onCircleClick(TagViewGroup.this);
             } else {
-                mClickListener.onTagsClicked();
+                ITagView clickedTag = isTouchingTags(x, y);
+                mClickListener.onTagClick(TagViewGroup.this, clickedTag, (int) clickedTag.getTag());
             }
             return true;
         }
@@ -453,6 +519,7 @@ public class TagViewGroup extends ViewGroup {
             mPercentX = currentX / getMeasuredWidth();
             mPercentY = currentY / getMeasuredHeight();
             requestLayout();
+            mClickListener.onScroll(TagViewGroup.this, mPercentX, mPercentY);
             return true;
         }
 
@@ -461,8 +528,8 @@ public class TagViewGroup extends ViewGroup {
             super.onLongPress(e);
             float x = e.getX();
             float y = e.getY();
-            if (mCenterRect.contains(x, y) || isTouchingTags(x, y)) {
-                mClickListener.onLongPress();
+            if (mCenterRect.contains(x, y) || isTouchingTags(x, y) != null) {
+                mClickListener.onLongPress(TagViewGroup.this);
             }
         }
     }

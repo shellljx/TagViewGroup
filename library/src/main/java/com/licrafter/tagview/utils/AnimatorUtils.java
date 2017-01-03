@@ -1,10 +1,8 @@
 package com.licrafter.tagview.utils;
 
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
 import com.licrafter.tagview.TagViewGroup;
