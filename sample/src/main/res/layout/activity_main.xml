@@ -14,13 +14,6 @@
         android:layout_height="350dp"/>
 
     <Button
-        android:id="@+id/refreshButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:text="刷新"/>
-
-    <Button
         android:id="@+id/transButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

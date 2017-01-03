@@ -26,9 +26,10 @@ import java.util.List;
 public class TagImageView extends FrameLayout {
 
     private ImageView mImageView;
-    private FrameLayout mTagsContent;
-    private List<TagGroupModel> mTagGroupList = new ArrayList<>();
+    private FrameLayout mContentLayout;
+    private List<TagGroupModel> mTagGroupModelList = new ArrayList<>();
     private List<TagViewGroup> mTagGroupViewList = new ArrayList<>();
+    private boolean mIsEditMode;
 
     public TagImageView(Context context) {
         this(context, null);
@@ -43,35 +44,57 @@ public class TagImageView extends FrameLayout {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rootView = inflater.inflate(R.layout.layout_tag_imageview, this, true);
         mImageView = (ImageView) rootView.findViewById(R.id.imageview);
-        mTagsContent = (FrameLayout) rootView.findViewById(R.id.tagsGroup);
+        mContentLayout = (FrameLayout) rootView.findViewById(R.id.tagsGroup);
     }
 
     public void setTagList(List<TagGroupModel> tagGroupList) {
-        mTagGroupList.clear();
-        mTagsContent.removeAllViews();
+        mTagGroupModelList.clear();
+        mContentLayout.removeAllViews();
         mTagGroupViewList.clear();
-        mTagGroupList.addAll(tagGroupList);
-        for (TagGroupModel model : mTagGroupList) {
+        mTagGroupModelList.addAll(tagGroupList);
+        for (TagGroupModel model : mTagGroupModelList) {
             TagViewGroup tagViewGroup = getTagViewGroup(model);
             tagViewGroup.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            addView(tagViewGroup);
+            mContentLayout.addView(tagViewGroup);
             mTagGroupViewList.add(tagViewGroup);
         }
     }
 
+    public void addTagGroup(TagGroupModel model, TagViewGroup.OnTagGroupClickListener listener) {
+        mTagGroupModelList.add(model);
+        TagViewGroup tagViewGroup = getTagViewGroup(model);
+        tagViewGroup.setOnTagGroupClickListener(listener);
+        tagViewGroup.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        mContentLayout.addView(tagViewGroup);
+        mTagGroupViewList.add(tagViewGroup);
+    }
+
+    public int getTagGroupIndex(TagViewGroup tagGroup) {
+        return mTagGroupViewList.indexOf(tagGroup);
+    }
+
     public TagViewGroup getTagViewGroup(TagGroupModel model) {
         TagViewGroup tagViewGroup = new TagViewGroup(getContext());
-        tagViewGroup.setShowAnimator(AnimatorUtils.getTagShowAnimator(tagViewGroup))
-                .setHideAnimator(AnimatorUtils.getTagHideAnimator(tagViewGroup));
-        for (TagGroupModel.Tag tag : model.getTags()) {
-            TagTextView tagTextView = new TagTextView(getContext());
-            tagTextView.setDirection(parseDirection(tag.getDirection()));
-            tagTextView.setText(tag.getName());
-            tagViewGroup.addTag(tagTextView);
+        if (!mIsEditMode) {
+            setTagGroupAnimation(tagViewGroup);
         }
-        tagViewGroup.addRipple();
+        for (TagGroupModel.Tag tag : model.getTags()) {
+            tagViewGroup.addTag(makeTagTextView(tag));
+        }
         tagViewGroup.setPercent(model.getPercentX(), model.getPercentY());
         return tagViewGroup;
+    }
+
+    public TagTextView makeTagTextView(TagGroupModel.Tag tag) {
+        TagTextView tagTextView = new TagTextView(getContext());
+        tagTextView.setDirection(DIRECTION.valueOf(tag.getDirection()));
+        tagTextView.setText(tag.getName());
+        return tagTextView;
+    }
+
+    public void setTagGroupAnimation(TagViewGroup group) {
+        group.setShowAnimator(AnimatorUtils.getTagShowAnimator(group))
+                .setHideAnimator(AnimatorUtils.getTagHideAnimator(group)).addRipple();
     }
 
     public void excuteTagsAnimation() {
@@ -84,36 +107,15 @@ public class TagImageView extends FrameLayout {
         }
     }
 
+    public void setEditMode(boolean editMode) {
+        mIsEditMode = editMode;
+    }
+
     public void setImageUrl(String url) {
         ImageLoader.loadImage(url, mImageView);
     }
 
-    public DIRECTION parseDirection(int direction) {
-        switch (direction) {
-            case 0:
-                return DIRECTION.RIGHT_TOP;
-            case 1:
-                return DIRECTION.RIGHT_TOP_TILT;
-            case 2:
-                return DIRECTION.RIGHT_CENTER;
-            case 3:
-                return DIRECTION.RIGHT_BOTTOM;
-            case 4:
-                return DIRECTION.RIGHT_BOTTOM_TILT;
-            case 5:
-                return DIRECTION.LEFT_BOTTOM;
-            case 6:
-                return DIRECTION.LEFT_BOTTOM_TILT;
-            case 7:
-                return DIRECTION.LEFT_CENTER;
-            case 8:
-                return DIRECTION.LEFT_TOP;
-            case 9:
-                return DIRECTION.LEFT_TOP_TILT;
-            case 10:
-                return DIRECTION.CENTER;
-
-        }
-        return null;
+    public void removeTagGroup(TagViewGroup tagViewGroup) {
+        mContentLayout.removeView(tagViewGroup);
     }
 }
