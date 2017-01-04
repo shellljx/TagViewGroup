@@ -13,62 +13,15 @@
         android:layout_width="match_parent"
         android:layout_height="350dp"/>
 
-    <LinearLayout
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="标签一"/>
-
-        <EditText
-            android:id="@+id/edit1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="输入标签一的内容"
-            android:textColorHint="#c4c4c4"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="标签二"/>
-
-        <EditText
-            android:id="@+id/edit2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="输入标签二的内容"
-            android:textColorHint="#c4c4c4"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="标签三"/>
-
-        <EditText
-            android:id="@+id/edit3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="输入标签三的内容"
-            android:textColorHint="#c4c4c4"/>
-    </LinearLayout>
+        android:layout_marginTop="5dp"
+        android:text="@string/info_string"/>
 
     <Button
-        android:id="@+id/createButton"
+        android:id="@+id/createBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="创建"/>

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TagViewGroup</string>
+    <string name="info_string">"1. 点击创建按钮开始创建标签组\n2. 按住标签组滑动，调整位置\n3.点击单个标签，调整该标签的方向\n4. 点击中心圆弹出dialog\n5. 长按标签组删除"</string>
 </resources>
