@@ -3,6 +3,8 @@ Android 仿`小红书`图片标签，实现了图片标签的动画，布局，�
 
 [![](https://jitpack.io/v/shellljx/TagViewGroup.svg)](https://jitpack.io/#shellljx/TagViewGroup)
 
+![](http://7vzpfd.com1.z0.glb.clouddn.com/ezgif.com-dc9f221590.gif)
+
 #Gradle
 
 **Step 1.**Add it in your root build.gradle at the end of repositories:
