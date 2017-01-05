@@ -20,12 +20,8 @@ import com.licrafter.tagview.utils.DipConvertUtils;
  **/
 public class RippleView extends View implements ITagView {
 
-    private static final int DEFAULT_MINRADIUS = 6;
-    private static final int DEFAULT_MAXRADIUS = 20;
-
     private int mRadius;
     private int mAlpha;
-    private int mMinRadius;
     private DIRECTION mDirection;
     private Paint mPaint;
     private AnimatorSet mAnimator;
@@ -41,21 +37,8 @@ public class RippleView extends View implements ITagView {
 
     public RippleView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        int maxRadius = DipConvertUtils.dip2px(context, DEFAULT_MAXRADIUS);
-        mRadius = mMinRadius = DipConvertUtils.dip2px(context, DEFAULT_MINRADIUS);
         mPaint = new Paint();
         mPaint.setColor(Color.WHITE);
-
-        ObjectAnimator radius = ObjectAnimator.ofInt(this, "RippleRadius", mMinRadius, maxRadius);
-        radius.setRepeatMode(ValueAnimator.RESTART);
-        radius.setRepeatCount(ValueAnimator.INFINITE);
-        ObjectAnimator alpha = ObjectAnimator.ofInt(this, "RippleAlpha", 100, 0);
-        alpha.setRepeatMode(ValueAnimator.RESTART);
-        alpha.setRepeatCount(ValueAnimator.INFINITE);
-        mAnimator = new AnimatorSet();
-        mAnimator.playTogether(radius, alpha);
-        mAnimator.setDuration(1000);
-        mAnimator.setInterpolator(new AccelerateInterpolator());
     }
 
     @Override
@@ -92,7 +75,6 @@ public class RippleView extends View implements ITagView {
     }
 
     public void stopRipple() {
-        mRadius = mMinRadius;
         mAnimator.end();
     }
 
@@ -111,5 +93,18 @@ public class RippleView extends View implements ITagView {
     public void setCenterPoint(int x, int y) {
         mX = x;
         mY = y;
+    }
+
+    public void initAnimator(int minRadius, int maxRadius, int alpha) {
+        ObjectAnimator radiusAnimator = ObjectAnimator.ofInt(this, "RippleRadius", minRadius, maxRadius);
+        radiusAnimator.setRepeatMode(ValueAnimator.RESTART);
+        radiusAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        ObjectAnimator alphaAnimator = ObjectAnimator.ofInt(this, "RippleAlpha", alpha, 0);
+        alphaAnimator.setRepeatMode(ValueAnimator.RESTART);
+        alphaAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        mAnimator = new AnimatorSet();
+        mAnimator.playTogether(radiusAnimator, alphaAnimator);
+        mAnimator.setDuration(1000);
+        mAnimator.setInterpolator(new AccelerateInterpolator());
     }
 }

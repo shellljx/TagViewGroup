@@ -3,6 +3,8 @@ package com.licrafter.tagview;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -37,6 +39,8 @@ public class TagViewGroup extends ViewGroup {
     public static final int DEFAULT_TILT_DISTANCE = 20;//默认斜线长度
     public static final int DEFAULT_BODER_WIDTH = 1;//默认线宽
     public static final int DEFAULT_MAX_TAG = 6;//默认标签最大数量
+    private static final int DEFAULT_RIPPLE_MAX_RADIUS = 20;//水波纹默认最大半径
+    private static final int DEFULT_RIPPLE_ALPHA = 100;//默认水波纹透明度
 
     private Paint mPaint;
     private Path mPath;
@@ -48,6 +52,9 @@ public class TagViewGroup extends ViewGroup {
     private OnTagGroupClickListener mClickListener;
 
     private RippleView mRippleView;
+    private int mRippleMaxRadius;//水波纹最大半径
+    private int mRippleMinRadius;//水波纹最小半径
+    private int mRippleAlpha;//水波纹起始透明度
     private int mRadius;//外圆半径
     private int mInnerRadius;//内圆半径
     private int mTDistance;//斜线长度
@@ -75,11 +82,17 @@ public class TagViewGroup extends ViewGroup {
 
     public TagViewGroup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mRadius = DipConvertUtils.dip2px(context, DEFAULT_RADIUS);
-        mInnerRadius = DipConvertUtils.dip2px(context, DEFAULT_INNER_RADIUS);
-        mTDistance = DipConvertUtils.dip2px(context, DEFAULT_TILT_DISTANCE);
-        mVDistance = DipConvertUtils.dip2px(context, DEFAULT_V_DISTANCE);
-        mBoderWidth = DipConvertUtils.dip2px(context, DEFAULT_BODER_WIDTH);
+        Resources.Theme theme = context.getTheme();
+        TypedArray array = theme.obtainStyledAttributes(attrs, R.styleable.TagViewGroup, defStyleAttr, 0);
+        mRadius = array.getDimensionPixelSize(R.styleable.TagViewGroup_radius, DipConvertUtils.dip2px(context, DEFAULT_RADIUS));
+        mInnerRadius = array.getDimensionPixelSize(R.styleable.TagViewGroup_inner_radius, DipConvertUtils.dip2px(context, DEFAULT_INNER_RADIUS));
+        mTDistance = array.getDimensionPixelSize(R.styleable.TagViewGroup_tilt_distance, DipConvertUtils.dip2px(context, DEFAULT_TILT_DISTANCE));
+        mVDistance = array.getDimensionPixelSize(R.styleable.TagViewGroup_v_distance, DipConvertUtils.dip2px(context, DEFAULT_V_DISTANCE));
+        mBoderWidth = array.getDimensionPixelSize(R.styleable.TagViewGroup_line_width, DipConvertUtils.dip2px(context, DEFAULT_BODER_WIDTH));
+        mRippleMaxRadius = array.getDimensionPixelSize(R.styleable.TagViewGroup_ripple_radius, DipConvertUtils.dip2px(context, DEFAULT_RIPPLE_MAX_RADIUS));
+        mRippleAlpha = array.getInteger(R.styleable.TagViewGroup_ripple_alpha, DEFULT_RIPPLE_ALPHA);
+        mRippleMinRadius = mInnerRadius + (mRadius - mInnerRadius) / 2;
+        array.recycle();
         mPaint = new Paint();
         mPath = new Path();
         mDstPath = new Path();
@@ -355,6 +368,7 @@ public class TagViewGroup extends ViewGroup {
         mRippleView = new RippleView(getContext());
         mRippleView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         mRippleView.setDirection(DIRECTION.CENTER);
+        mRippleView.initAnimator(mRippleMinRadius, mRippleMaxRadius, mRippleAlpha);
         addView(mRippleView);
     }
 
