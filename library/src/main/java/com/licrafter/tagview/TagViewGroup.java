@@ -37,7 +37,7 @@ public class TagViewGroup extends ViewGroup {
     public static final int DEFAULT_INNER_RADIUS = 4;//默认内圆半径
     public static final int DEFAULT_V_DISTANCE = 28;//默认竖直(上/下)方向线条长度
     public static final int DEFAULT_TILT_DISTANCE = 20;//默认斜线长度
-    public static final int DEFAULT_BODER_WIDTH = 1;//默认线宽
+    public static final int DEFAULT_LINES_WIDTH = 1;//默认线宽
     public static final int DEFAULT_MAX_TAG = 6;//默认标签最大数量
     private static final int DEFAULT_RIPPLE_MAX_RADIUS = 20;//水波纹默认最大半径
     private static final int DEFULT_RIPPLE_ALPHA = 100;//默认水波纹透明度
@@ -67,7 +67,7 @@ public class TagViewGroup extends ViewGroup {
     private int mCenterY;//圆心 Y 坐标
     private float mPercentX;
     private float mPercentY;
-    private int mBoderWidth;//线条宽度
+    private int mLinesWidth;//线条宽度
     private boolean mIsHiden;
 
     private float mLinesRatio = 1;
@@ -88,8 +88,8 @@ public class TagViewGroup extends ViewGroup {
         mInnerRadius = array.getDimensionPixelSize(R.styleable.TagViewGroup_inner_radius, DipConvertUtils.dip2px(context, DEFAULT_INNER_RADIUS));
         mTDistance = array.getDimensionPixelSize(R.styleable.TagViewGroup_tilt_distance, DipConvertUtils.dip2px(context, DEFAULT_TILT_DISTANCE));
         mVDistance = array.getDimensionPixelSize(R.styleable.TagViewGroup_v_distance, DipConvertUtils.dip2px(context, DEFAULT_V_DISTANCE));
-        mBoderWidth = array.getDimensionPixelSize(R.styleable.TagViewGroup_line_width, DipConvertUtils.dip2px(context, DEFAULT_BODER_WIDTH));
-        mRippleMaxRadius = array.getDimensionPixelSize(R.styleable.TagViewGroup_ripple_radius, DipConvertUtils.dip2px(context, DEFAULT_RIPPLE_MAX_RADIUS));
+        mLinesWidth = array.getDimensionPixelSize(R.styleable.TagViewGroup_line_width, DipConvertUtils.dip2px(context, DEFAULT_LINES_WIDTH));
+        mRippleMaxRadius = array.getDimensionPixelSize(R.styleable.TagViewGroup_ripple_maxRadius, DipConvertUtils.dip2px(context, DEFAULT_RIPPLE_MAX_RADIUS));
         mRippleAlpha = array.getInteger(R.styleable.TagViewGroup_ripple_alpha, DEFULT_RIPPLE_ALPHA);
         mRippleMinRadius = mInnerRadius + (mRadius - mInnerRadius) / 2;
         array.recycle();
@@ -256,7 +256,7 @@ public class TagViewGroup extends ViewGroup {
 
     private void drawLines(Canvas canvas) {
         mPaint.setColor(Color.WHITE);
-        mPaint.setStrokeWidth(mBoderWidth);
+        mPaint.setStrokeWidth(mLinesWidth);
         mPaint.setStyle(Paint.Style.STROKE);
 
         for (int i = 0; i < getChildCount(); i++) {
@@ -546,5 +546,101 @@ public class TagViewGroup extends ViewGroup {
                 mClickListener.onLongPress(TagViewGroup.this);
             }
         }
+    }
+
+    /**
+     * 设置线条宽度
+     *
+     * @param lineWidth 线条宽度
+     */
+    public void setLineWidth(int lineWidth) {
+        mLinesWidth = lineWidth;
+    }
+
+    /**
+     * 得到线条宽度
+     *
+     * @return
+     */
+    public int getLineWidth() {
+        return mLinesWidth;
+    }
+
+    /**
+     * 设置中心外圆半径
+     *
+     * @param radius 半径
+     */
+    public void setRadius(int radius) {
+        mRadius = radius;
+    }
+
+    /**
+     * 得到中心圆半径
+     *
+     * @return
+     */
+    public int getRadius() {
+        return mRadius;
+    }
+
+    public void setInnerRadius(int innerRadius) {
+        mInnerRadius = innerRadius;
+    }
+
+    public int getInnerRadius() {
+        return mInnerRadius;
+    }
+
+    /**
+     * 设置圆心到折点的垂直距离
+     *
+     * @param vDistance 垂直距离
+     */
+    public void setVDistance(int vDistance) {
+        mVDistance = vDistance;
+    }
+
+    public int getVDistance() {
+        return mVDistance;
+    }
+
+    /**
+     * 设置圆心到斜线折点的垂直距离
+     *
+     * @param titlDistance 垂直距离
+     */
+    public void setTitlDistance(int titlDistance) {
+        mTDistance = titlDistance;
+    }
+
+    public int getTitlDistance() {
+        return mTDistance;
+    }
+
+    /**
+     * 设置水波纹最大半径
+     *
+     * @param radius 最大半径
+     */
+    public void setRippleMaxRadius(int radius) {
+        mRippleMaxRadius = radius;
+    }
+
+    public int getRippleMaxRadius() {
+        return mRippleMaxRadius;
+    }
+
+    /**
+     * 设置水波纹起始透明度
+     *
+     * @param alpha 透明度
+     */
+    public void setRippleAlpha(int alpha) {
+        mRippleAlpha = alpha;
+    }
+
+    public int getRippleAlpha() {
+        return mRippleAlpha;
     }
 }
