@@ -60,4 +60,21 @@ tagViewGroup.setShowAnimator(AnimatorUtils.getTagShowAnimator(tagViewGroup))
 |tilt_distance|圆心到斜线折点的垂直距离|
 |ripple_alpha|水波纹起始透明度|
 |ripple_maxRadius|水波纹最大半径|
-     
+
+#How to implement your own Tag view
+
+**Step 1.** create a view implement `ITagView` interface.
+
+**Step 2.** Override the following methods:
+
+```groovy
+@Override
+public void setDirection(DIRECTION direction) {
+    mDirection = direction;
+}
+
+@Override
+public DIRECTION getDirection() {
+    return mDirection;
+}
+```
