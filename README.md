@@ -42,6 +42,7 @@ dependencies {
 
 **2. Or in code**
 ```groovy
+TagViewGroup tagViewGroup = new TagViewGroup(getContext());
 tagViewGroup.setShowAnimator(AnimatorUtils.getTagShowAnimator(tagViewGroup))
         .setHideAnimator(AnimatorUtils.getTagHideAnimator(tagViewGroup))
         .addTagList(tagViewList)
