@@ -62,6 +62,16 @@ tagViewGroup.setShowAnimator(AnimatorUtils.getTagShowAnimator(tagViewGroup))
 |ripple_alpha|水波纹起始透明度|
 |ripple_maxRadius|水波纹最大半径|
 
+#How to customize the animation
+
+You can use the following properties in Property Animation:
+
+|property属性|description 描述|
+|:---|:---|
+|LinesRatio|线条显现的长度占总长度的百分比|
+|TagAlpha|单个Tag的透明度|
+|CircleRadius|中心圆半径|
+
 #How to implement your own Tag view
 
 **Step 1.** create a view implement `ITagView` interface.
