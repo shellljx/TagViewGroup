@@ -71,6 +71,7 @@ You can use the following properties in Property Animation:
 |LinesRatio|线条显现的长度占总长度的百分比|
 |TagAlpha|单个Tag的透明度|
 |CircleRadius|中心圆半径|
+|CircleInnerRadius|中心内圆半径|
 
 #How to implement your own Tag view
 
