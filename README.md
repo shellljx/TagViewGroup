@@ -20,7 +20,7 @@ allprojects {
 **Step 2.**Add the dependency
 ```groovy
 dependencies {
-	    compile 'com.github.shellljx:TagViewGroup:v1.1'
+	    compile 'com.github.shellljx:TagViewGroup:v1.2'
 }
 ```
 
