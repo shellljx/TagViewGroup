@@ -46,11 +46,15 @@ public class AnimatorUtils {
         return animator;
     }
 
-    private static Animator circleRadiusAnimator(TagViewGroup target) {
-        int defaultRadius = DipConvertUtils.dip2px(target.getContext(), TagViewGroup.DEFAULT_INNER_RADIUS);
-        ObjectAnimator animator = ObjectAnimator.ofInt(target, "CircleRadius",
-                defaultRadius - 10, defaultRadius + 10, defaultRadius);
-        animator.setDuration(400);
-        return animator;
+    private static AnimatorSet circleRadiusAnimator(TagViewGroup target) {
+
+        int radius = target.getRadius();
+        int innerRadius = target.getInnerRadius();
+        AnimatorSet set = new AnimatorSet();
+        set.playTogether(ObjectAnimator.ofInt(target, "CircleRadius",
+                radius - 10, radius + 10, radius),
+                ObjectAnimator.ofInt(target, "CircleInnerRadius", innerRadius - 10, innerRadius + 10, innerRadius));
+        set.setDuration(400);
+        return set;
     }
 }

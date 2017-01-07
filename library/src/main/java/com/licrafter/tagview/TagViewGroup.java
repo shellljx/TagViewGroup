@@ -237,15 +237,14 @@ public class TagViewGroup extends ViewGroup {
         super.dispatchDraw(canvas);
         //绘制折线
         drawLines(canvas);
+        //绘制外圆
+        mPaint.setStyle(Paint.Style.FILL);
+        mPaint.setColor(Color.parseColor("#30000000"));
+        canvas.drawCircle(mCenterX, mCenterY, mRadius, mPaint);
         //绘制内圆
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(Color.WHITE);
         canvas.drawCircle(mCenterX, mCenterY, mInnerRadius, mPaint);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setColor(Color.parseColor("#30000000"));
-        mPaint.setStrokeWidth(mRadius - mInnerRadius);
-        //绘制外圆
-        canvas.drawCircle(mCenterX, mCenterY, mInnerRadius + (mRadius - mInnerRadius) / 2, mPaint);
     }
 
     private void drawTagAlpha(float alpha) {
@@ -439,8 +438,16 @@ public class TagViewGroup extends ViewGroup {
      */
     @SuppressWarnings("unused")
     public void setCircleRadius(int radius) {
-        mInnerRadius = radius;
-        mRadius = mInnerRadius + DipConvertUtils.dip2px(getContext(), 4);
+        mRadius = radius;
+        invalidate();
+    }
+
+    /**
+     * 属性 CircleInnerRadius 的属性动画调用,设置中心内圆半径
+     */
+    @SuppressWarnings("unused")
+    public void setCircleInnerRadius(int innerRadius) {
+        mInnerRadius = innerRadius;
         invalidate();
     }
 
