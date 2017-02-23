@@ -14,6 +14,7 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
+import android.util.Property;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -59,6 +60,7 @@ public class TagViewGroup extends ViewGroup {
     private int mInnerRadius;//内圆半径
     private int mTDistance;//斜线长度
     private int mVDistance;//竖直(上/下)方向线条长度
+    private float mTagAlpha;//Tag标签的透明度
     private RectF mCenterRect;
     private RectF[] mRectArray;
     private int[] mChildUsed;
@@ -433,50 +435,6 @@ public class TagViewGroup extends ViewGroup {
         return this;
     }
 
-    /**
-     * 属性 CircleRadius 的属性动画调用，设置中心圆的半径
-     */
-    @SuppressWarnings("unused")
-    public void setCircleRadius(int radius) {
-        mRadius = radius;
-        invalidate();
-    }
-
-    /**
-     * 属性 CircleInnerRadius 的属性动画调用,设置中心内圆半径
-     */
-    @SuppressWarnings("unused")
-    public void setCircleInnerRadius(int innerRadius) {
-        mInnerRadius = innerRadius;
-        invalidate();
-    }
-
-    /**
-     * 属性 LinesRatio 的属性动画调用，设置线条显示比例
-     */
-    @SuppressWarnings("unused")
-    public void setLinesRatio(float ratio) {
-        mLinesRatio = ratio;
-        invalidate();
-    }
-
-    /**
-     * 属性 TagAlpha 的属性动画调用，设置 Tag 的透明度
-     */
-    @SuppressWarnings("unused")
-    public void setTagAlpha(float alpha) {
-        drawTagAlpha(alpha);
-    }
-
-
-    public boolean isHiden() {
-        return mIsHiden;
-    }
-
-    public void setHiden(boolean hiden) {
-        mIsHiden = hiden;
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (mClickListener != null) {
@@ -553,6 +511,67 @@ public class TagViewGroup extends ViewGroup {
                 mClickListener.onLongPress(TagViewGroup.this);
             }
         }
+    }
+
+    /**
+     * 属性 CircleRadius 的属性动画调用，设置中心圆的半径
+     */
+    @SuppressWarnings("unused")
+    public void setCircleRadius(int radius) {
+        mRadius = radius;
+        invalidate();
+    }
+
+    public int getCircleRadius() {
+        return mRadius;
+    }
+
+    /**
+     * 属性 CircleInnerRadius 的属性动画调用,设置中心内圆半径
+     */
+    @SuppressWarnings("unused")
+    public void setCircleInnerRadius(int innerRadius) {
+        mInnerRadius = innerRadius;
+        invalidate();
+    }
+
+    public int getCircleInnerRadius() {
+        return mInnerRadius;
+    }
+
+    /**
+     * 属性 LinesRatio 的属性动画调用，设置线条显示比例
+     */
+    @SuppressWarnings("unused")
+    public void setLinesRatio(float ratio) {
+        mLinesRatio = ratio;
+        invalidate();
+    }
+
+    public float getLinesRatio() {
+        return mLinesRatio;
+    }
+
+    /**
+     * 属性 TagAlpha 的属性动画调用，设置 Tag 的透明度
+     */
+    @SuppressWarnings("unused")
+    public void setTagAlpha(float alpha) {
+        mTagAlpha = alpha;
+        drawTagAlpha(mTagAlpha);
+    }
+
+    public float getTagAlpha() {
+        return mTagAlpha;
+    }
+
+
+    public boolean isHiden() {
+        return mIsHiden;
+    }
+
+    public void setHiden(boolean hiden) {
+        mIsHiden = hiden;
     }
 
     /**
@@ -650,4 +669,52 @@ public class TagViewGroup extends ViewGroup {
     public int getRippleAlpha() {
         return mRippleAlpha;
     }
+
+    public static final Property<TagViewGroup, Integer> CIRCLE_RADIUS = new Property<TagViewGroup, Integer>(Integer.class, "circleRadius") {
+        @Override
+        public Integer get(TagViewGroup object) {
+            return object.getCircleRadius();
+        }
+
+        @Override
+        public void set(TagViewGroup object, Integer value) {
+            object.setCircleRadius(value);
+        }
+    };
+
+    public static final Property<TagViewGroup, Integer> CIRCLE_INNER_RADIUS = new Property<TagViewGroup, Integer>(Integer.class, "circleInnerRadius") {
+        @Override
+        public Integer get(TagViewGroup object) {
+            return object.getCircleInnerRadius();
+        }
+
+        @Override
+        public void set(TagViewGroup object, Integer value) {
+            object.setCircleInnerRadius(value);
+        }
+    };
+
+    public static final Property<TagViewGroup, Float> LINES_RATIO = new Property<TagViewGroup, Float>(Float.class, "linesRatio") {
+        @Override
+        public Float get(TagViewGroup object) {
+            return object.getLinesRatio();
+        }
+
+        @Override
+        public void set(TagViewGroup object, Float value) {
+            object.setLinesRatio(value);
+        }
+    };
+
+    public static final Property<TagViewGroup, Float> TAG_ALPHA = new Property<TagViewGroup, Float>(Float.class, "tagAlpha") {
+        @Override
+        public Float get(TagViewGroup object) {
+            return object.getTagAlpha();
+        }
+
+        @Override
+        public void set(TagViewGroup object, Float value) {
+            object.setTagAlpha(value);
+        }
+    };
 }
