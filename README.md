@@ -20,7 +20,7 @@ allprojects {
 **Step 2.**Add the dependency
 ```groovy
 dependencies {
-	    compile 'com.github.shellljx:TagViewGroup:v1.2'
+	    compile 'com.github.shellljx:TagViewGroup:v1.3'
 }
 ```
 
@@ -68,10 +68,10 @@ You can use the following properties in Property Animation:
 
 |property属性|description 描述|
 |:---|:---|
-|LinesRatio|线条显现的长度占总长度的百分比|
-|TagAlpha|单个Tag的透明度|
-|CircleRadius|中心圆半径|
-|CircleInnerRadius|中心内圆半径|
+|LinesRatio(TagViewGroup.LINES_RATIO)|线条显现的长度占总长度的百分比|
+|TagAlpha(TagViewGroup.TAG_ALPHA)|单个Tag的透明度|
+|CircleRadius(TagViewGroup.CIRCLE_RADIUS)|中心圆半径|
+|CircleInnerRadius(TagViewGroup.CIRCLE_INNER_RADIUS)|中心内圆半径|
 
 #How to implement your own Tag view
 
