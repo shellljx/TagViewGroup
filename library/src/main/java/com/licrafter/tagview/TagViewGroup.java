@@ -265,6 +265,7 @@ public class TagViewGroup extends ViewGroup {
             mPath.reset();
             mPath.moveTo(mCenterX, mCenterY);
             mDstPath.reset();
+            mDstPath.rLineTo(0,0);
             switch (child.getDirection()) {
                 case RIGHT_TOP://右上
                 case RIGHT_BOTTOM://右下
