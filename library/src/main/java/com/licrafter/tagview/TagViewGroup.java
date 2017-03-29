@@ -265,7 +265,7 @@ public class TagViewGroup extends ViewGroup {
             mPath.reset();
             mPath.moveTo(mCenterX, mCenterY);
             mDstPath.reset();
-            mDstPath.rLineTo(0,0);
+            mDstPath.rLineTo(0, 0);
             switch (child.getDirection()) {
                 case RIGHT_TOP://右上
                 case RIGHT_BOTTOM://右下
@@ -498,6 +498,7 @@ public class TagViewGroup extends ViewGroup {
             currentY = Math.min(Math.max(currentY, mChildUsed[1]), getMeasuredHeight() - mChildUsed[3]);
             mPercentX = currentX / getMeasuredWidth();
             mPercentY = currentY / getMeasuredHeight();
+            invalidate();
             requestLayout();
             mClickListener.onScroll(TagViewGroup.this, mPercentX, mPercentY);
             return true;
@@ -515,7 +516,7 @@ public class TagViewGroup extends ViewGroup {
     }
 
     /**
-     * 属性 CircleRadius 的属性动画调用，设置中心圆的半径
+     * 设置中心圆的半径
      */
     @SuppressWarnings("unused")
     public void setCircleRadius(int radius) {
@@ -528,7 +529,7 @@ public class TagViewGroup extends ViewGroup {
     }
 
     /**
-     * 属性 CircleInnerRadius 的属性动画调用,设置中心内圆半径
+     * 设置中心内圆半径
      */
     @SuppressWarnings("unused")
     public void setCircleInnerRadius(int innerRadius) {
@@ -541,7 +542,7 @@ public class TagViewGroup extends ViewGroup {
     }
 
     /**
-     * 属性 LinesRatio 的属性动画调用，设置线条显示比例
+     * 设置线条显示比例
      */
     @SuppressWarnings("unused")
     public void setLinesRatio(float ratio) {
@@ -554,7 +555,7 @@ public class TagViewGroup extends ViewGroup {
     }
 
     /**
-     * 属性 TagAlpha 的属性动画调用，设置 Tag 的透明度
+     * 设置 Tag 的透明度
      */
     @SuppressWarnings("unused")
     public void setTagAlpha(float alpha) {
@@ -582,6 +583,7 @@ public class TagViewGroup extends ViewGroup {
      */
     public void setLineWidth(int lineWidth) {
         mLinesWidth = lineWidth;
+        invalidate();
     }
 
     /**
@@ -591,32 +593,6 @@ public class TagViewGroup extends ViewGroup {
      */
     public int getLineWidth() {
         return mLinesWidth;
-    }
-
-    /**
-     * 设置中心外圆半径
-     *
-     * @param radius 半径
-     */
-    public void setRadius(int radius) {
-        mRadius = radius;
-    }
-
-    /**
-     * 得到中心圆半径
-     *
-     * @return
-     */
-    public int getRadius() {
-        return mRadius;
-    }
-
-    public void setInnerRadius(int innerRadius) {
-        mInnerRadius = innerRadius;
-    }
-
-    public int getInnerRadius() {
-        return mInnerRadius;
     }
 
     /**

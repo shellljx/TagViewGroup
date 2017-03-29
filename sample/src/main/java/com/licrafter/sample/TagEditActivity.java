@@ -76,6 +76,7 @@ public class TagEditActivity extends AppCompatActivity implements View.OnClickLi
         public void onTagClick(TagViewGroup group, ITagView tag, int index) {
             tag.setDirection(DIRECTION.valueOf((num++ % 10 + 1)));
             mModelList.get(mTagImageView.getTagGroupIndex(group)).getTags().get(index).setDirection(tag.getDirection().getValue());
+            group.invalidate();
             group.requestLayout();
         }
 

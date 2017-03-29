@@ -48,8 +48,8 @@ public class AnimatorUtils {
 
     private static AnimatorSet circleRadiusAnimator(TagViewGroup target) {
 
-        int radius = target.getRadius();
-        int innerRadius = target.getInnerRadius();
+        int radius = target.getCircleRadius();
+        int innerRadius = target.getCircleInnerRadius();
         AnimatorSet set = new AnimatorSet();
         set.playTogether(ObjectAnimator.ofInt(target, TagViewGroup.CIRCLE_RADIUS,
                 radius - 10, radius + 10, radius),
