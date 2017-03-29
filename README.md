@@ -5,7 +5,7 @@ Android 仿`小红书`图片标签，实现了图片标签的动画，布局，�
 
 ![](http://7vzpfd.com1.z0.glb.clouddn.com/ezgif.com-dc9f221590.gif)
 
-#Gradle
+# Gradle
 
 **Step 1.**Add it in your root build.gradle at the end of repositories:
 ```groovy
@@ -20,11 +20,11 @@ allprojects {
 **Step 2.**Add the dependency
 ```groovy
 dependencies {
-	    compile 'com.github.shellljx:TagViewGroup:v1.3'
+	    compile 'com.github.shellljx:TagViewGroup:-SNAPSHOT'
 }
 ```
 
-#How to use
+# How to use
 
 **1. Define in xml**
 ```groovy
@@ -73,7 +73,7 @@ You can use the following properties in Property Animation:
 |CircleRadius(TagViewGroup.CIRCLE_RADIUS)|中心圆半径|
 |CircleInnerRadius(TagViewGroup.CIRCLE_INNER_RADIUS)|中心内圆半径|
 
-#How to implement your own Tag view
+# How to implement your own Tag view
 
 **Step 1.** create a view implement `ITagView` interface.
 

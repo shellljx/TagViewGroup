@@ -485,7 +485,9 @@ public class TagViewGroup extends ViewGroup {
                 mClickListener.onCircleClick(TagViewGroup.this);
             } else {
                 ITagView clickedTag = isTouchingTags(x, y);
-                mClickListener.onTagClick(TagViewGroup.this, clickedTag, (int) clickedTag.getTag());
+                if (clickedTag != null) {
+                    mClickListener.onTagClick(TagViewGroup.this, clickedTag, (int) clickedTag.getTag());
+                }
             }
             return true;
         }
