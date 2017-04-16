@@ -114,6 +114,7 @@ public class TagViewGroup extends ViewGroup {
         //园中心默认在左上角 (0,0)
         mCenterX = (int) (getMeasuredWidth() * mPercentX);
         mCenterY = (int) (getMeasuredHeight() * mPercentY);
+        checkBounds();
         mCenterRect.set(mCenterX - mRadius, mCenterY - mRadius, mCenterX + mRadius, mCenterY + mRadius);
         if (mRippleView != null) {
             mRippleView.setCenterPoint(mCenterX, mCenterY);
@@ -176,6 +177,17 @@ public class TagViewGroup extends ViewGroup {
 
         }
         return new int[]{leftMax, topMax, rightMax, bottomMax};
+    }
+
+    private void checkBounds() {
+        int rightAvailable = getMeasuredWidth() - mCenterX;
+        int leftAvailable = mCenterX;
+        if (mChildUsed[2] > rightAvailable) {
+            mCenterX -= (mChildUsed[2] - rightAvailable);
+        }
+        if (mChildUsed[0] > leftAvailable) {
+            mCenterX += (mChildUsed[0] - leftAvailable);
+        }
     }
 
     @Override
