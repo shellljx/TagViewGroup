@@ -57,10 +57,6 @@ public class TagListActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onScroll(TagViewGroup group, float percentX, float percentY) {
-                }
-
-                @Override
                 public void onLongPress(final TagViewGroup group) {
                     Toast.makeText(TagListActivity.this, "点击中心圆", Toast.LENGTH_SHORT).show();
                 }

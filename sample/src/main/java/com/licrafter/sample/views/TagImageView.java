@@ -34,6 +34,7 @@ public class TagImageView extends FrameLayout {
     private List<TagGroupModel> mTagGroupModelList = new ArrayList<>();
     private List<TagViewGroup> mTagGroupViewList = new ArrayList<>();
     private TagViewGroup.OnTagGroupClickListener mClickListener;
+    private TagViewGroup.OnTagGroupDragListener mDragListener;
     private boolean mIsEditMode;
     private int num;
 
@@ -84,6 +85,8 @@ public class TagImageView extends FrameLayout {
         TagViewGroup tagViewGroup = new TagViewGroup(getContext());
         if (!mIsEditMode) {
             setTagGroupAnimation(tagViewGroup);
+        } else {
+            tagViewGroup.setOnTagGroupDragListener(mDragListener);
         }
         tagViewGroup.setTagAdapter(new TagAdapter() {
             @Override
@@ -148,7 +151,7 @@ public class TagImageView extends FrameLayout {
         group.requestLayout();
     }
 
-    public void onScroll(TagViewGroup group, float percentX, float percentY) {
+    public void onDrag(TagViewGroup group, float percentX, float percentY) {
         mTagGroupModelList.get(mTagGroupViewList.indexOf(group)).setPercentX(percentX);
         mTagGroupModelList.get(mTagGroupViewList.indexOf(group)).setPercentY(percentY);
     }
@@ -167,5 +170,9 @@ public class TagImageView extends FrameLayout {
 
     public void setTagGroupClickListener(TagViewGroup.OnTagGroupClickListener tagGroupClickListener) {
         mClickListener = tagGroupClickListener;
+    }
+
+    public void setTagGroupScrollListener(TagViewGroup.OnTagGroupDragListener scrollListener) {
+        mDragListener = scrollListener;
     }
 }

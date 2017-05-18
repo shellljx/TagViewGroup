@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivityForResult(new Intent(MainActivity.this, TagEditActivity.class), CREATE_TAG);
                 break;
             case R.id.listBtn:
-                startActivity(new Intent(MainActivity.this,TagListActivity.class));
+                startActivity(new Intent(MainActivity.this, TagListActivity.class));
                 break;
         }
     }
@@ -68,11 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onTagClick(TagViewGroup container, ITagView tag, int position) {
-            Toast.makeText(MainActivity.this, "点击Tag->"+((TagTextView)tag).getText().toString(), Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onScroll(TagViewGroup group, float percentX, float percentY) {
+            Toast.makeText(MainActivity.this, "点击Tag->" + ((TagTextView) tag).getText().toString(), Toast.LENGTH_SHORT).show();
         }
 
         @Override

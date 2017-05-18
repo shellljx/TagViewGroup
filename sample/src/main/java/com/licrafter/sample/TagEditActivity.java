@@ -41,6 +41,7 @@ public class TagEditActivity extends AppCompatActivity implements View.OnClickLi
         mSaveBtn = (Button) findViewById(R.id.saveButton);
         mTagImageView.setEditMode(true);
         mTagImageView.setTagGroupClickListener(mTagGroupClickListener);
+        mTagImageView.setTagGroupScrollListener(mTagGroupDragListener);
         mTagImageView.setImageUrl("http://ci.xiaohongshu.com/0c62c1d9-8183-4410-82cf-80492b88fdad@r_1280w_1280h.jpg");
         mSaveBtn.setOnClickListener(this);
         mCreateBtn.setOnClickListener(this);
@@ -70,12 +71,7 @@ public class TagEditActivity extends AppCompatActivity implements View.OnClickLi
 
         @Override
         public void onTagClick(TagViewGroup container, ITagView tag, int position) {
-            mTagImageView.onTagClicked(container,tag,position);
-        }
-
-        @Override
-        public void onScroll(TagViewGroup group, float percentX, float percentY) {
-            mTagImageView.onScroll(group,percentX,percentY);
+            mTagImageView.onTagClicked(container, tag, position);
         }
 
         @Override
@@ -95,6 +91,13 @@ public class TagEditActivity extends AppCompatActivity implements View.OnClickLi
                         }
                     }).setTitle("删除标签组").setMessage("你确定要删除该标签组吗？")
                     .create().show();
+        }
+    };
+
+    private TagViewGroup.OnTagGroupDragListener mTagGroupDragListener = new TagViewGroup.OnTagGroupDragListener() {
+        @Override
+        public void onDrag(TagViewGroup container, float percentX, float percentY) {
+            mTagImageView.onDrag(container, percentX, percentY);
         }
     };
 

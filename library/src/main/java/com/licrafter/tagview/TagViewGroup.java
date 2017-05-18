@@ -56,6 +56,7 @@ public class TagViewGroup extends ViewGroup {
     private TagAdapter mAdapter;
     private GestureDetectorCompat mGestureDetector;
     private OnTagGroupClickListener mClickListener;
+    private OnTagGroupDragListener mScrollListener;
 
     private RippleView mRippleView;
     private int mRippleMaxRadius;//水波纹最大半径
@@ -276,7 +277,7 @@ public class TagViewGroup extends ViewGroup {
         if (mRippleView != null) {
             mRippleView.stopRipple();
         }
-        android.util.Log.d("ljx","detach");
+        android.util.Log.d("ljx", "detach");
         super.onDetachedFromWindow();
     }
 
@@ -468,6 +469,10 @@ public class TagViewGroup extends ViewGroup {
         mClickListener = listener;
     }
 
+    public void setOnTagGroupDragListener(OnTagGroupDragListener listener) {
+        this.mScrollListener = listener;
+    }
+
     public interface OnTagGroupClickListener {
 
         //TagGroup 中心圆点被点击
@@ -478,9 +483,11 @@ public class TagViewGroup extends ViewGroup {
 
         //TagGroup 被长按
         void onLongPress(TagViewGroup container);
+    }
 
-        //TagGroup 移动
-        void onScroll(TagViewGroup container, float percentX, float percentY);
+    public interface OnTagGroupDragListener {
+        //TagGroup 拖动
+        void onDrag(TagViewGroup container, float percentX, float percentY);
     }
 
     //内部处理 touch 事件监听器
@@ -514,15 +521,17 @@ public class TagViewGroup extends ViewGroup {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            float currentX = mCenterX - distanceX;
-            float currentY = mCenterY - distanceY;
-            currentX = Math.min(Math.max(currentX, mChildUsed[0]), getMeasuredWidth() - mChildUsed[2]);
-            currentY = Math.min(Math.max(currentY, mChildUsed[1]), getMeasuredHeight() - mChildUsed[3]);
-            mPercentX = currentX / getMeasuredWidth();
-            mPercentY = currentY / getMeasuredHeight();
-            invalidate();
-            requestLayout();
-            mClickListener.onScroll(TagViewGroup.this, mPercentX, mPercentY);
+            if (mScrollListener != null) {
+                float currentX = mCenterX - distanceX;
+                float currentY = mCenterY - distanceY;
+                currentX = Math.min(Math.max(currentX, mChildUsed[0]), getMeasuredWidth() - mChildUsed[2]);
+                currentY = Math.min(Math.max(currentY, mChildUsed[1]), getMeasuredHeight() - mChildUsed[3]);
+                mPercentX = currentX / getMeasuredWidth();
+                mPercentY = currentY / getMeasuredHeight();
+                invalidate();
+                requestLayout();
+                mScrollListener.onDrag(TagViewGroup.this, mPercentX, mPercentY);
+            }
             return true;
         }
 
