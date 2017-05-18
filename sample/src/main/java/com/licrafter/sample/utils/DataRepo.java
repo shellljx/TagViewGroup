@@ -14,6 +14,8 @@ import java.util.List;
 public class DataRepo {
     public static List<TagGroupModel> tagGroupList = new ArrayList<>();
 
+    public static List<String> imgList = new ArrayList<>();
+
     public static void initData() {
         TagGroupModel model = new TagGroupModel();
         TagGroupModel model2 = new TagGroupModel();
@@ -50,5 +52,9 @@ public class DataRepo {
 
         tagGroupList.add(model);
         tagGroupList.add(model2);
+
+        imgList.add("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1495086393352&di=34b56305a066e6e41b5c130c582e2bd2&imgtype=0&src=http%3A%2F%2Fimg.sj33.cn%2Fuploads%2Fallimg%2F201302%2F1-130201105055.jpg");
+        imgList.add("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1495086393352&di=cf405d1e53f6eddaf4ee15e364e274cb&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F05e5e1554af04100000115a8236351.jpg");
+        imgList.add("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1495086442229&di=a21f2b58706c9778bddb110f0176b29b&imgtype=jpg&src=http%3A%2F%2Fimg4.imgtn.bdimg.com%2Fit%2Fu%3D2369900843%2C1093290712%26fm%3D214%26gp%3D0.jpg");
     }
 }

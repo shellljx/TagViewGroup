@@ -11,7 +11,7 @@
     <com.licrafter.sample.views.TagImageView
         android:id="@+id/tagImageView"
         android:layout_width="match_parent"
-        android:layout_height="350dp"/>
+        android:layout_height="250dp"/>
 
     <Button
         android:id="@+id/transButton"
@@ -19,5 +19,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:text="创建标签"/>
+
+    <Button
+        android:id="@+id/listBtn"
+        android:layout_marginTop="5dp"
+        android:text="标签列表"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

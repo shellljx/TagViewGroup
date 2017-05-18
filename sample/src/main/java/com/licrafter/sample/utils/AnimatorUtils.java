@@ -1,4 +1,4 @@
-package com.licrafter.tagview.utils;
+package com.licrafter.sample.utils;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
@@ -46,7 +46,7 @@ public class AnimatorUtils {
         return animator;
     }
 
-    private static AnimatorSet circleRadiusAnimator(TagViewGroup target) {
+    public static AnimatorSet circleRadiusAnimator(TagViewGroup target) {
 
         int radius = target.getCircleRadius();
         int innerRadius = target.getCircleInnerRadius();

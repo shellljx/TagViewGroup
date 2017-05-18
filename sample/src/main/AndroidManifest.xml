@@ -15,8 +15,12 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".TagEditActivity"
+        <activity
+            android:name=".TagEditActivity"
             android:label="创建TAG"/>
+        <activity
+            android:name=".TagListActivity"
+            android:label="标签列表"/>
     </application>
     <!-- Normal Permission -->
     <uses-permission android:name="android.permission.INTERNET"/>

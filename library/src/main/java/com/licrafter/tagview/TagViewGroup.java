@@ -1,7 +1,6 @@
 package com.licrafter.tagview;
 
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -11,7 +10,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.RectF;
-import android.support.annotation.NonNull;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Property;
@@ -43,12 +41,19 @@ public class TagViewGroup extends ViewGroup {
     private static final int DEFAULT_RIPPLE_MAX_RADIUS = 20;//水波纹默认最大半径
     private static final int DEFULT_RIPPLE_ALPHA = 100;//默认水波纹透明度
 
+    static class ItemInfo {
+        ITagView item;
+        int position;
+        RectF rectF = new RectF();
+    }
+
     private Paint mPaint;
     private Path mPath;
     private Path mDstPath;
     private PathMeasure mPathMeasure;
     private Animator mShowAnimator;
     private Animator mHideAnimator;
+    private TagAdapter mAdapter;
     private GestureDetectorCompat mGestureDetector;
     private OnTagGroupClickListener mClickListener;
 
@@ -62,15 +67,13 @@ public class TagViewGroup extends ViewGroup {
     private int mVDistance;//竖直(上/下)方向线条长度
     private float mTagAlpha;//Tag标签的透明度
     private RectF mCenterRect;
-    private RectF[] mRectArray;
+    private ArrayList<ItemInfo> mItems = new ArrayList<>();
     private int[] mChildUsed;
-    private int mTagCount;
     private int mCenterX;//圆心 X 坐标
     private int mCenterY;//圆心 Y 坐标
     private float mPercentX;
     private float mPercentY;
     private int mLinesWidth;//线条宽度
-    private boolean mIsHiden;
 
     private float mLinesRatio = 1;
 
@@ -103,7 +106,6 @@ public class TagViewGroup extends ViewGroup {
         mGestureDetector = new GestureDetectorCompat(context, new TagOnGestureListener());
         mChildUsed = new int[4];
         mCenterRect = new RectF();
-        mRectArray = new RectF[6];
     }
 
     @Override
@@ -242,8 +244,8 @@ public class TagViewGroup extends ViewGroup {
                     break;
             }
             child.layout(left, top, left + child.getMeasuredWidth(), top + child.getMeasuredHeight());
+            refreshTagsInfo(child);
         }
-        refreshTagsRect();
     }
 
     @Override
@@ -259,6 +261,23 @@ public class TagViewGroup extends ViewGroup {
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(Color.WHITE);
         canvas.drawCircle(mCenterX, mCenterY, mInnerRadius, mPaint);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        if (mRippleView != null) {
+            mRippleView.startRipple();
+        }
+        super.onAttachedToWindow();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        if (mRippleView != null) {
+            mRippleView.stopRipple();
+        }
+        android.util.Log.d("ljx","detach");
+        super.onDetachedFromWindow();
     }
 
     private void drawTagAlpha(float alpha) {
@@ -302,52 +321,12 @@ public class TagViewGroup extends ViewGroup {
         }
     }
 
-    public void showWithAnimation() {
-        if (!checkAnimating()) {
-            setVisibility(View.VISIBLE);
-            mShowAnimator.start();
-        }
-    }
-
-    public void hideWithAnimation() {
-        if (!checkAnimating()) {
-            mHideAnimator.start();
-        }
-    }
-
-    private boolean checkAnimating() {
-        return mShowAnimator == null || mHideAnimator == null
-                || mShowAnimator.isRunning() || mHideAnimator.isRunning();
-    }
-
-    /**
-     * 添加 Tag 列表
-     *
-     * @param tagList 要添加的 Tag 列表
-     * @return 返回 标签组
-     */
-    public TagViewGroup addTagList(@NonNull List<ITagView> tagList) {
-        for (ITagView tag : tagList) {
-            addTag(tag);
-        }
-        return this;
-    }
-
-    /**
-     * 添加单个 Tag
-     *
-     * @param tag 要添加的 Tag
-     * @return 返回 标签组
-     */
-    public TagViewGroup addTag(@NonNull ITagView tag) {
-        if (mTagCount >= DEFAULT_MAX_TAG) {
-            throw new RuntimeException("The number of tags exceeds the maximum value(6)");
-        }
-        tag.setTag(mTagCount);
-        addView((View) tag);
-        mRectArray[mTagCount] = new RectF();
-        mTagCount++;
-        return this;
+    ItemInfo addnewItem(int position) {
+        ItemInfo itemInfo = new ItemInfo();
+        itemInfo.position = position;
+        itemInfo.item = mAdapter.instantiateItem(this, position);
+        mItems.add(itemInfo);
+        return itemInfo;
     }
 
     /**
@@ -357,45 +336,99 @@ public class TagViewGroup extends ViewGroup {
      */
     public List<ITagView> getTagList() {
         List<ITagView> list = new ArrayList<>();
-        for (int i = 0; i < getChildCount(); i++) {
-            ITagView tag = (ITagView) getChildAt(i);
-            if (tag.getDirection() != DIRECTION.CENTER) {
-                list.add(tag);
-            }
+        for (int i = 0; i < mItems.size(); i++) {
+            list.add(mItems.get(i).item);
         }
         return list;
     }
 
     /**
-     * 得到 TagViewGroup 中的标签数量
-     *
-     * @return
-     */
-    public int getTagCount() {
-        return mTagCount;
-    }
-
-    /**
      * 添加水波纹
      */
-    public void addRipple() {
+    public TagViewGroup addRipple() {
         mRippleView = new RippleView(getContext());
         mRippleView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         mRippleView.setDirection(DIRECTION.CENTER);
         mRippleView.initAnimator(mRippleMinRadius, mRippleMaxRadius, mRippleAlpha);
         addView(mRippleView);
+        return this;
     }
 
-    private void refreshTagsRect() {
-        for (int i = 0; i < getChildCount(); i++) {
-            ITagView child = (ITagView) getChildAt(i);
-            if (child.getDirection() != DIRECTION.CENTER) {
-                int index = (int) child.getTag();
-                if (mRectArray[index] == null) {
-                    mRectArray[index] = new RectF();
-                }
-                mRectArray[index].set(child.getLeft(), child.getTop(), child.getRight(), child.getBottom());
+    public TagViewGroup setShowAnimator(Animator animator) {
+        mShowAnimator = animator;
+        return this;
+    }
+
+    public TagViewGroup setHideAnimator(Animator animator) {
+        mHideAnimator = animator;
+        return this;
+    }
+
+    public void startShowAnimator() {
+        if (mShowAnimator != null && !mShowAnimator.isRunning()) {
+            mShowAnimator.start();
+        }
+    }
+
+    public void startHideAnimator() {
+        if (mHideAnimator != null && !mHideAnimator.isRunning()) {
+            mHideAnimator.start();
+        }
+    }
+
+    public void setTagAdapter(TagAdapter adapter) {
+        if (mAdapter != null) {
+            for (int i = 0; i < mItems.size(); i++) {
+                ItemInfo itemInfo = mItems.get(i);
+                mAdapter.destroyItem(this, itemInfo.position, itemInfo.item);
+                mItems.clear();
+                removeAllViews();
             }
+        }
+        mAdapter = adapter;
+        if (mAdapter != null) {
+            //// TODO: 2017/5/17 observer
+        }
+        populate();
+    }
+
+    public TagAdapter getTagAdapter() {
+        return mAdapter;
+    }
+
+    void populate() {
+        int count = mAdapter.getCount();
+        if (count < 0 || count > DEFAULT_MAX_TAG) {
+            throw new IllegalStateException("TagView count must >= 0 并且 <= " + DEFAULT_MAX_TAG);
+        }
+        for (int i = 0; i < count; i++) {
+            addnewItem(i);
+        }
+    }
+
+    ItemInfo infoForChild(View child) {
+        for (int i = 0; i < mItems.size(); i++) {
+            ItemInfo info = mItems.get(i);
+            if (mAdapter.isViewFromObject(child, info)) {
+                return info;
+            }
+        }
+        return null;
+    }
+
+    ItemInfo infoForTagView(ITagView tagView) {
+        for (int i = 0; i < mItems.size(); i++) {
+            ItemInfo info = mItems.get(i);
+            if (info.item.equals(tagView)) {
+                return info;
+            }
+        }
+        return null;
+    }
+
+    private void refreshTagsInfo(ITagView child) {
+        if (child.getDirection() != DIRECTION.CENTER) {
+            infoForTagView(child).rectF.set(child.getLeft(), child.getTop(), child.getRight(), child.getBottom());
         }
     }
 
@@ -406,11 +439,11 @@ public class TagViewGroup extends ViewGroup {
      * @param y
      * @return
      */
-    private ITagView isTouchingTags(float x, float y) {
-        for (int i = 0; i < getChildCount(); i++) {
-            ITagView child = (ITagView) getChildAt(i);
-            if (child.getDirection() != DIRECTION.CENTER && mRectArray[(int) child.getTag()].contains(x, y)) {
-                return child;
+    private ItemInfo isTouchingTags(float x, float y) {
+        for (int i = 0; i < mItems.size(); i++) {
+            ItemInfo info = mItems.get(i);
+            if (info.rectF.contains(x, y)) {
+                return info;
             }
         }
         return null;
@@ -421,31 +454,6 @@ public class TagViewGroup extends ViewGroup {
     public void setPercent(float percentX, float percentY) {
         mPercentX = percentX;
         mPercentY = percentY;
-    }
-
-    public TagViewGroup setShowAnimator(Animator animator) {
-        mShowAnimator = animator;
-        mShowAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                setHiden(false);
-            }
-        });
-        return this;
-    }
-
-    public TagViewGroup setHideAnimator(Animator animator) {
-        mHideAnimator = animator;
-        mHideAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                setVisibility(INVISIBLE);
-                setHiden(true);
-            }
-        });
-        return this;
     }
 
     @Override
@@ -463,16 +471,16 @@ public class TagViewGroup extends ViewGroup {
     public interface OnTagGroupClickListener {
 
         //TagGroup 中心圆点被点击
-        void onCircleClick(TagViewGroup group);
+        void onCircleClick(TagViewGroup container);
 
         //TagGroup Tag子view被点击
-        void onTagClick(TagViewGroup group, ITagView tag, int index);
+        void onTagClick(TagViewGroup container, ITagView tag, int position);
 
         //TagGroup 被长按
-        void onLongPress(TagViewGroup group);
+        void onLongPress(TagViewGroup container);
 
         //TagGroup 移动
-        void onScroll(TagViewGroup group, float percentX, float percentY);
+        void onScroll(TagViewGroup container, float percentX, float percentY);
     }
 
     //内部处理 touch 事件监听器
@@ -496,9 +504,9 @@ public class TagViewGroup extends ViewGroup {
             if (mCenterRect.contains(x, y)) {
                 mClickListener.onCircleClick(TagViewGroup.this);
             } else {
-                ITagView clickedTag = isTouchingTags(x, y);
-                if (clickedTag != null) {
-                    mClickListener.onTagClick(TagViewGroup.this, clickedTag, (int) clickedTag.getTag());
+                ItemInfo info = isTouchingTags(x, y);
+                if (info != null) {
+                    mClickListener.onTagClick(TagViewGroup.this, info.item, info.position);
                 }
             }
             return true;
@@ -579,15 +587,6 @@ public class TagViewGroup extends ViewGroup {
 
     public float getTagAlpha() {
         return mTagAlpha;
-    }
-
-
-    public boolean isHiden() {
-        return mIsHiden;
-    }
-
-    public void setHiden(boolean hiden) {
-        mIsHiden = hiden;
     }
 
     /**

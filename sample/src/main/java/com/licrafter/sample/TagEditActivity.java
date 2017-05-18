@@ -2,9 +2,9 @@ package com.licrafter.sample;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -13,12 +13,9 @@ import com.licrafter.sample.model.TagGroupModel;
 import com.licrafter.sample.utils.DataRepo;
 import com.licrafter.sample.views.TagEditDialog;
 import com.licrafter.sample.views.TagImageView;
-import com.licrafter.tagview.DIRECTION;
 import com.licrafter.tagview.TagViewGroup;
 import com.licrafter.tagview.views.ITagView;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * author: shell
@@ -30,9 +27,7 @@ public class TagEditActivity extends AppCompatActivity implements View.OnClickLi
     private Button mSaveBtn, mCreateBtn;
     private TagImageView mTagImageView;
     private TagEditDialog mDialog;
-
-    private int num;
-    private List<TagGroupModel> mModelList = new ArrayList<>();
+    private ViewPager mPager;
 
 
     @Override
@@ -45,6 +40,7 @@ public class TagEditActivity extends AppCompatActivity implements View.OnClickLi
 
         mSaveBtn = (Button) findViewById(R.id.saveButton);
         mTagImageView.setEditMode(true);
+        mTagImageView.setTagGroupClickListener(mTagGroupClickListener);
         mTagImageView.setImageUrl("http://ci.xiaohongshu.com/0c62c1d9-8183-4410-82cf-80492b88fdad@r_1280w_1280h.jpg");
         mSaveBtn.setOnClickListener(this);
         mCreateBtn.setOnClickListener(this);
@@ -55,7 +51,7 @@ public class TagEditActivity extends AppCompatActivity implements View.OnClickLi
         switch (v.getId()) {
             case R.id.saveButton:
                 setResult(RESULT_OK);
-                DataRepo.tagGroupList = mModelList;
+                DataRepo.tagGroupList = mTagImageView.getTagGroupModels();
                 finish();
                 break;
             case R.id.tagImageView:
@@ -68,22 +64,18 @@ public class TagEditActivity extends AppCompatActivity implements View.OnClickLi
 
     private TagViewGroup.OnTagGroupClickListener mTagGroupClickListener = new TagViewGroup.OnTagGroupClickListener() {
         @Override
-        public void onCircleClick(TagViewGroup group) {
+        public void onCircleClick(TagViewGroup container) {
             Toast.makeText(TagEditActivity.this, "点击中心圆", Toast.LENGTH_SHORT).show();
         }
 
         @Override
-        public void onTagClick(TagViewGroup group, ITagView tag, int index) {
-            tag.setDirection(DIRECTION.valueOf((num++ % 10 + 1)));
-            mModelList.get(mTagImageView.getTagGroupIndex(group)).getTags().get(index).setDirection(tag.getDirection().getValue());
-            group.invalidate();
-            group.requestLayout();
+        public void onTagClick(TagViewGroup container, ITagView tag, int position) {
+            mTagImageView.onTagClicked(container,tag,position);
         }
 
         @Override
         public void onScroll(TagViewGroup group, float percentX, float percentY) {
-            mModelList.get(mTagImageView.getTagGroupIndex(group)).setPercentX(percentX);
-            mModelList.get(mTagImageView.getTagGroupIndex(group)).setPercentY(percentY);
+            mTagImageView.onScroll(group,percentX,percentY);
         }
 
         @Override
@@ -99,7 +91,6 @@ public class TagEditActivity extends AppCompatActivity implements View.OnClickLi
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             mTagImageView.removeTagGroup(group);
-                            mModelList.remove(mTagImageView.getTagGroupIndex(group));
                             dialog.dismiss();
                         }
                     }).setTitle("删除标签组").setMessage("你确定要删除该标签组吗？")
@@ -114,8 +105,7 @@ public class TagEditActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onTagGroupCreated(TagGroupModel group) {
-        mModelList.add(group);
-        mTagImageView.addTagGroup(group, mTagGroupClickListener);
+        mTagImageView.addTagGroup(group);
         mDialog.dismiss();
     }
 }
