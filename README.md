@@ -5,6 +5,11 @@ Android 仿`小红书`图片标签，实现了图片标签的动画，布局，�
 
 ![](http://7vzpfd.com1.z0.glb.clouddn.com/ezgif.com-dc9f221590.gif)
 
+# Important Update
+1. added `TagAdapter` and make it easier to create TagViewGroup.
+
+2. moved `AnimatorUtils` out of the library to make it clean.
+
 # Gradle
 
 **Step 1.**Add it in your root build.gradle at the end of repositories:
@@ -43,11 +48,52 @@ dependencies {
 **2. Or in code**
 ```groovy
 TagViewGroup tagViewGroup = new TagViewGroup(getContext());
-tagViewGroup.setShowAnimator(AnimatorUtils.getTagShowAnimator(tagViewGroup))
-        .setHideAnimator(AnimatorUtils.getTagHideAnimator(tagViewGroup))
-        .addTagList(tagViewList)
-        .setPercent(percentX,percentY)
-        .addRipple();
+```
+**3. add animator**
+```groovy
+// set hide animator ,show animator and ripple
+tagViewGroup.setHideAnimator(hideAnimator).setShowAnimator(showAnimator).addRipple();
+```
+**4. set tagAdapter**
+```groovy
+tagViewGroup.setTagAdapter(new TagAdapter() {
+    @Override
+    public int getCount() {
+        return model.getTags().size();
+    }
+
+    @Override
+    public ITagView getItem(int position) {
+        return makeTagTextView(model.getTags().get(position));
+    }
+});
+
+//set tagViewGroup location
+tagViewGroup.setPercent(model.getPercentX(), model.getPercentY());
+```
+**5. handle click events**
+```groovy
+tagViewGroup.setOnTagGroupClickListener(new TagViewGroup.OnTagGroupClickListener() {
+    @Override
+    public void onCircleClick(TagViewGroup container) {
+    //click the white circle of TagViewGroup         
+    }
+
+    @Override
+    public void onTagClick(TagViewGroup container, ITagView tag, int position) {
+    //clikc a tag of TagViewGroup
+    }
+
+    @Override
+    public void onLongPress(TagViewGroup container) {
+    
+    }
+
+    @Override
+    public void onScroll(TagViewGroup container, float percentX, float percentY) {
+    
+    }
+});
 ```
 
 **Attributes:**
