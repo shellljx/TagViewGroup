@@ -72,12 +72,12 @@ tagViewGroup.setTagAdapter(new TagAdapter() {
 tagViewGroup.setPercent(model.getPercentX(), model.getPercentY());
 ```
 
-**5. notifyDataSetChanged**
+**5. NotifyDataSetChanged**
 ```groovy
 tagViewGroup.getTagAdapter().notifyDataSetChanged();
 ```
 
-**6. handle click events**
+**6. Handle click events**
 ```groovy
 tagViewGroup.setOnTagGroupClickListener(new TagViewGroup.OnTagGroupClickListener() {
     @Override
@@ -119,7 +119,7 @@ tagViewGroup.setOnTagGroupDragListener(new TagViewGroup.OnTagGroupDragListener()
 |ripple_alpha|水波纹起始透明度|
 |ripple_maxRadius|水波纹最大半径|
 
-#How to customize the animation
+# How to customize the animation
 
 You can use the following properties in Property Animation:
 
