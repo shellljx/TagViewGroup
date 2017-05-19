@@ -71,7 +71,7 @@ tagViewGroup.setTagAdapter(new TagAdapter() {
 //set tagViewGroup location
 tagViewGroup.setPercent(model.getPercentX(), model.getPercentY());
 ```
-**5. Handle click events**
+
 **5. notifyDataSetChanged**
 ```groovy
 tagViewGroup.getTagAdapter().notifyDataSetChanged();
@@ -96,7 +96,7 @@ tagViewGroup.setOnTagGroupClickListener(new TagViewGroup.OnTagGroupClickListener
     }
 });
 ```
-**6. Drag TagViewGroup**
+**7. Drag TagViewGroup**
 ```groovy
 //you can drag tagViewGroup only if you set OnTagGroupDragListener
 tagViewGroup.setOnTagGroupDragListener(new TagViewGroup.OnTagGroupDragListener() {
