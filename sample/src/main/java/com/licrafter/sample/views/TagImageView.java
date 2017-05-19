@@ -87,6 +87,12 @@ public class TagImageView extends FrameLayout {
             setTagGroupAnimation(tagViewGroup);
         } else {
             tagViewGroup.setOnTagGroupDragListener(mDragListener);
+            tagViewGroup.setOnTagGroupDragListener(new TagViewGroup.OnTagGroupDragListener() {
+                @Override
+                public void onDrag(TagViewGroup container, float percentX, float percentY) {
+
+                }
+            });
         }
         tagViewGroup.setTagAdapter(new TagAdapter() {
             @Override
@@ -145,10 +151,8 @@ public class TagImageView extends FrameLayout {
     }
 
     public void onTagClicked(TagViewGroup group, ITagView tagView, int position) {
-        tagView.setDirection(DIRECTION.valueOf((num++ % 10 + 1)));
-        mTagGroupModelList.get(mTagGroupViewList.indexOf(group)).getTags().get(position).setDirection(tagView.getDirection().getValue());
-        group.invalidate();
-        group.requestLayout();
+        mTagGroupModelList.get(mTagGroupViewList.indexOf(group)).getTags().get(position).setDirection(tagView.getDirection().getValue() % 10 + 1);
+        group.getTagAdapter().notifyDataSetChanged();
     }
 
     public void onDrag(TagViewGroup group, float percentX, float percentY) {

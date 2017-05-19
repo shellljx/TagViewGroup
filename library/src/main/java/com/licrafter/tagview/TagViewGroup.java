@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -57,6 +58,7 @@ public class TagViewGroup extends ViewGroup {
     private GestureDetectorCompat mGestureDetector;
     private OnTagGroupClickListener mClickListener;
     private OnTagGroupDragListener mScrollListener;
+    private final TagSetObserver mObserver = new TagSetObserver();
 
     private RippleView mRippleView;
     private int mRippleMaxRadius;//水波纹最大半径
@@ -277,7 +279,6 @@ public class TagViewGroup extends ViewGroup {
         if (mRippleView != null) {
             mRippleView.stopRipple();
         }
-        android.util.Log.d("ljx", "detach");
         super.onDetachedFromWindow();
     }
 
@@ -379,16 +380,12 @@ public class TagViewGroup extends ViewGroup {
 
     public void setTagAdapter(TagAdapter adapter) {
         if (mAdapter != null) {
-            for (int i = 0; i < mItems.size(); i++) {
-                ItemInfo itemInfo = mItems.get(i);
-                mAdapter.destroyItem(this, itemInfo.position, itemInfo.item);
-                mItems.clear();
-                removeAllViews();
-            }
+            mAdapter.unregisterDataSetObserver(mObserver);
+            clearGroup();
         }
         mAdapter = adapter;
         if (mAdapter != null) {
-            //// TODO: 2017/5/17 observer
+            mAdapter.registerDataSetObserver(mObserver);
         }
         populate();
     }
@@ -397,14 +394,28 @@ public class TagViewGroup extends ViewGroup {
         return mAdapter;
     }
 
+    void clearGroup() {
+        for (int i = 0; i < mItems.size(); i++) {
+            ItemInfo itemInfo = mItems.get(i);
+            mAdapter.destroyItem(this, itemInfo.position, itemInfo.item);
+            mItems.clear();
+            removeAllViews();
+        }
+    }
+
     void populate() {
         int count = mAdapter.getCount();
         if (count < 0 || count > DEFAULT_MAX_TAG) {
-            throw new IllegalStateException("TagView count must >= 0 并且 <= " + DEFAULT_MAX_TAG);
+            throw new IllegalStateException("TagView count must >= 0 and <= " + DEFAULT_MAX_TAG);
         }
         for (int i = 0; i < count; i++) {
             addnewItem(i);
         }
+    }
+
+    void dataSetChanged() {
+        clearGroup();
+        populate();
     }
 
     ItemInfo infoForChild(View child) {
@@ -667,6 +678,14 @@ public class TagViewGroup extends ViewGroup {
 
     public int getRippleAlpha() {
         return mRippleAlpha;
+    }
+
+    public class TagSetObserver extends DataSetObserver {
+
+        @Override
+        public void onChanged() {
+            dataSetChanged();
+        }
     }
 
     public static final Property<TagViewGroup, Integer> CIRCLE_RADIUS = new Property<TagViewGroup, Integer>(Integer.class, "circleRadius") {

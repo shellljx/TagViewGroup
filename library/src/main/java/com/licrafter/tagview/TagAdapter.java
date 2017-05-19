@@ -1,5 +1,7 @@
 package com.licrafter.tagview;
 
+import android.database.DataSetObservable;
+import android.database.DataSetObserver;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,7 @@ public abstract class TagAdapter {
 
     private static final boolean DEBUG = false;
     private static final String TAG = "TagAdapter";
+    private DataSetObservable mObservable = new DataSetObservable();
 
     /**
      * Return the number of ITagView.
@@ -43,6 +46,18 @@ public abstract class TagAdapter {
 
     public int getItemId(int position) {
         return position;
+    }
+
+    public void notifyDataSetChanged() {
+        mObservable.notifyChanged();
+    }
+
+    public void registerDataSetObserver(DataSetObserver observer) {
+        mObservable.registerObserver(observer);
+    }
+
+    public void unregisterDataSetObserver(DataSetObserver observer) {
+        mObservable.unregisterObserver(observer);
     }
 
 }

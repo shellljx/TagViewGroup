@@ -71,7 +71,12 @@ tagViewGroup.setTagAdapter(new TagAdapter() {
 //set tagViewGroup location
 tagViewGroup.setPercent(model.getPercentX(), model.getPercentY());
 ```
-**5. handle click events**
+**5. notifyDataSetChanged**
+```groovy
+tagViewGroup.getTagAdapter().notifyDataSetChanged();
+```
+
+**6. handle click events**
 ```groovy
 tagViewGroup.setOnTagGroupClickListener(new TagViewGroup.OnTagGroupClickListener() {
     @Override
@@ -90,7 +95,7 @@ tagViewGroup.setOnTagGroupClickListener(new TagViewGroup.OnTagGroupClickListener
     }
 
     @Override
-    public void onScroll(TagViewGroup container, float percentX, float percentY) {
+    public void onDrag(TagViewGroup container, float percentX, float percentY) {
     
     }
 });

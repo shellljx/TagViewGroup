@@ -2,6 +2,7 @@ package com.licrafter.sample;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,8 @@ import com.licrafter.sample.views.TagImageView;
 import com.licrafter.tagview.TagViewGroup;
 import com.licrafter.tagview.views.ITagView;
 
+import java.util.Random;
+
 
 /**
  * author: shell
@@ -27,8 +30,6 @@ public class TagEditActivity extends AppCompatActivity implements View.OnClickLi
     private Button mSaveBtn, mCreateBtn;
     private TagImageView mTagImageView;
     private TagEditDialog mDialog;
-    private ViewPager mPager;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

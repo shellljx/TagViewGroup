@@ -14,7 +14,6 @@ import com.licrafter.sample.utils.DataRepo;
 import com.licrafter.sample.views.TagImageView;
 import com.licrafter.tagview.TagViewGroup;
 import com.licrafter.tagview.views.ITagView;
-import com.licrafter.tagview.views.TagTextView;
 
 /**
  * Created by lijx on 2017/5/18.
@@ -23,6 +22,7 @@ import com.licrafter.tagview.views.TagTextView;
 public class TagListActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerview;
+    private ImgAdapter mAdapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,7 +30,8 @@ public class TagListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tag_list);
         mRecyclerview = (RecyclerView) findViewById(R.id.recycler);
         mRecyclerview.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerview.setAdapter(new ImgAdapter());
+        mAdapter = new ImgAdapter();
+        mRecyclerview.setAdapter(mAdapter);
     }
 
     private class ImgAdapter extends RecyclerView.Adapter<ImgHolder> {
@@ -44,7 +45,7 @@ public class TagListActivity extends AppCompatActivity {
                     holder.imageView.excuteTagsAnimation();
                 }
             });
-            TagViewGroup.OnTagGroupClickListener listener = new TagViewGroup.OnTagGroupClickListener() {
+            final TagViewGroup.OnTagGroupClickListener listener = new TagViewGroup.OnTagGroupClickListener() {
                 @Override
                 public void onCircleClick(TagViewGroup container) {
                     Toast.makeText(TagListActivity.this, "点击中心圆", Toast.LENGTH_SHORT).show();
