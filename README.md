@@ -12,7 +12,7 @@ Android 仿`小红书`图片标签，实现了图片标签的动画，布局，�
 
 # Gradle
 
-**Step 1.**Add it in your root build.gradle at the end of repositories:
+**Step 1.** Add it in your root build.gradle at the end of repositories:
 ```groovy
 allprojects {
 	repositories {
@@ -22,7 +22,7 @@ allprojects {
 }
 ```
 
-**Step 2.**Add the dependency
+**Step 2.** Add the dependency
 ```groovy
 dependencies {
 	    compile 'com.github.shellljx:TagViewGroup:-SNAPSHOT'
@@ -49,12 +49,12 @@ dependencies {
 ```groovy
 TagViewGroup tagViewGroup = new TagViewGroup(getContext());
 ```
-**3. add animator**
+**3. Add animator**
 ```groovy
 // set hide animator ,show animator and ripple
 tagViewGroup.setHideAnimator(hideAnimator).setShowAnimator(showAnimator).addRipple();
 ```
-**4. set tagAdapter**
+**4. Set tagAdapter**
 ```groovy
 tagViewGroup.setTagAdapter(new TagAdapter() {
     @Override
@@ -71,6 +71,7 @@ tagViewGroup.setTagAdapter(new TagAdapter() {
 //set tagViewGroup location
 tagViewGroup.setPercent(model.getPercentX(), model.getPercentY());
 ```
+**5. Handle click events**
 **5. notifyDataSetChanged**
 ```groovy
 tagViewGroup.getTagAdapter().notifyDataSetChanged();
@@ -93,10 +94,15 @@ tagViewGroup.setOnTagGroupClickListener(new TagViewGroup.OnTagGroupClickListener
     public void onLongPress(TagViewGroup container) {
     
     }
-
+});
+```
+**6. Drag TagViewGroup**
+```groovy
+//you can drag tagViewGroup only if you set OnTagGroupDragListener
+tagViewGroup.setOnTagGroupDragListener(new TagViewGroup.OnTagGroupDragListener() {
     @Override
     public void onDrag(TagViewGroup container, float percentX, float percentY) {
-    
+                    
     }
 });
 ```
