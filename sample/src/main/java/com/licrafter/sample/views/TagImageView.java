@@ -87,12 +87,6 @@ public class TagImageView extends FrameLayout {
             setTagGroupAnimation(tagViewGroup);
         } else {
             tagViewGroup.setOnTagGroupDragListener(mDragListener);
-            tagViewGroup.setOnTagGroupDragListener(new TagViewGroup.OnTagGroupDragListener() {
-                @Override
-                public void onDrag(TagViewGroup container, float percentX, float percentY) {
-
-                }
-            });
         }
         tagViewGroup.setTagAdapter(new TagAdapter() {
             @Override
