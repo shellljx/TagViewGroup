@@ -1,0 +1,8 @@
+ext{
+    supportLib = '27.0.2'
+    targetVersion = 27
+    minVersion = 15
+    picasso = '2.5.2'
+    junit = '4.12'
+    tagViewGroup = '-SNAPSHOT'
+}

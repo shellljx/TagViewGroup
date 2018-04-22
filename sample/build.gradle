@@ -1,12 +1,13 @@
 apply plugin: 'com.android.application'
+apply from: new File('../dependence.gradle')
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion project.ext.targetVersion
+    buildToolsVersion "${project.ext.supportLib}"
     defaultConfig {
         applicationId 'com.licrafter.sample'
-        minSdkVersion 15
-        targetSdkVersion 25
+        minSdkVersion project.ext.minVersion
+        targetSdkVersion project.ext.targetVersion
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -26,10 +27,10 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    testCompile 'junit:junit:4.12'
-    //compile 'com.github.shellljx:TagViewGroup:-SNAPSHOT'
-    compile project(path: ':library')
+    api "com.android.support:appcompat-v7:${project.ext.supportLib}"
+    api "com.android.support:design:${project.ext.supportLib}"
+    api "com.squareup.picasso:picasso:${project.ext.picasso}"
+    testCompile "junit:junit:${project.ext.junit}"
+    //implementation "com.github.shellljx:TagViewGroup:${project.ext.tagViewGroup}"
+    implementation project(path: ':library')
 }

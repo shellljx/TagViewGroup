@@ -1,12 +1,13 @@
 apply plugin: 'com.android.library'
+apply from: new File('../dependence.gradle')
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion project.ext.targetVersion
+    buildToolsVersion "${project.ext.supportLib}"
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 25
+        minSdkVersion project.ext.minVersion
+        targetSdkVersion project.ext.targetVersion
         versionCode 1
         versionName "1.0"
 
@@ -26,6 +27,6 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    testCompile 'junit:junit:4.12'
+    api "com.android.support:appcompat-v7:${project.ext.supportLib}"
+    testCompile "junit:junit:${project.ext.junit}"
 }
