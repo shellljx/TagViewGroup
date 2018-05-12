@@ -21,22 +21,22 @@ public class DataRepo {
         TagGroupModel model2 = new TagGroupModel();
 
         TagGroupModel.Tag tag0 = new TagGroupModel.Tag();
-        tag0.setDirection(DIRECTION.RIGHT_TOP.getValue());
+        tag0.setDirection(DirectionUtils.getValue(DIRECTION.RIGHT_TOP));
         tag0.setLink("http://www.baidu.com");
         tag0.setName("头层牛皮");
 
         TagGroupModel.Tag tag1 = new TagGroupModel.Tag();
-        tag1.setDirection(DIRECTION.RIGHT_CENTER.getValue());
+        tag1.setDirection(DirectionUtils.getValue(DIRECTION.RIGHT_CENTER));
         tag1.setLink("http://blog.licrafter.com");
         tag1.setName("英伦加绒青年棕色保暖鞋子。");
 
         TagGroupModel.Tag tag2 = new TagGroupModel.Tag();
-        tag2.setDirection(DIRECTION.RIGHT_BOTTOM.getValue());
+        tag2.setDirection(DirectionUtils.getValue(DIRECTION.RIGHT_BOTTOM));
         tag2.setLink("http://mc.licrafter.com");
         tag2.setName("PLAYBOY/花花公子");
 
         TagGroupModel.Tag tag3 = new TagGroupModel.Tag();
-        tag3.setDirection(DIRECTION.RIGHT_CENTER.getValue());
+        tag3.setDirection(DirectionUtils.getValue(DIRECTION.RIGHT_CENTER));
         tag3.setLink("http://mc.licrafter.com");
         tag3.setName("很不错的鞋子");
 

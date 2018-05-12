@@ -3,7 +3,6 @@ package com.licrafter.sample.views;
 import android.app.Dialog;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -11,6 +10,7 @@ import android.widget.EditText;
 
 import com.licrafter.sample.R;
 import com.licrafter.sample.model.TagGroupModel;
+import com.licrafter.sample.utils.DirectionUtils;
 import com.licrafter.tagview.DIRECTION;
 
 import java.util.ArrayList;
@@ -70,16 +70,16 @@ public class TagEditDialog extends Dialog implements View.OnClickListener {
     private void setTagDirection(List<TagGroupModel.Tag> tagList) {
         switch (tagList.size()) {
             case 3:
-                tagList.get(0).setDirection(DIRECTION.RIGHT_TOP.getValue());
-                tagList.get(1).setDirection(DIRECTION.RIGHT_CENTER.getValue());
-                tagList.get(2).setDirection(DIRECTION.RIGHT_BOTTOM.getValue());
+                tagList.get(0).setDirection(DirectionUtils.getValue(DIRECTION.RIGHT_TOP));
+                tagList.get(1).setDirection(DirectionUtils.getValue(DIRECTION.RIGHT_CENTER));
+                tagList.get(2).setDirection(DirectionUtils.getValue(DIRECTION.RIGHT_BOTTOM));
                 break;
             case 2:
-                tagList.get(0).setDirection(DIRECTION.RIGHT_TOP.getValue());
-                tagList.get(1).setDirection(DIRECTION.RIGHT_BOTTOM.getValue());
+                tagList.get(0).setDirection(DirectionUtils.getValue(DIRECTION.RIGHT_TOP));
+                tagList.get(1).setDirection(DirectionUtils.getValue(DIRECTION.RIGHT_BOTTOM));
                 break;
             case 1:
-                tagList.get(0).setDirection(DIRECTION.RIGHT_CENTER.getValue());
+                tagList.get(0).setDirection(DirectionUtils.getValue(DIRECTION.RIGHT_CENTER));
                 break;
         }
     }

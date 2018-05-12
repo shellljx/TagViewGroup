@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply from: new File('../dependence.gradle')
 
 android {
@@ -20,6 +21,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main {
+            resources.srcDirs = ['src/main/resources', 'src/main/resources/']
+            java.srcDirs = ['src/main/java', 'src/main/kotlin']
+        }
+    }
 }
 
 dependencies {
@@ -29,4 +36,8 @@ dependencies {
     })
     api "com.android.support:appcompat-v7:${project.ext.supportLib}"
     testCompile "junit:junit:${project.ext.junit}"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }

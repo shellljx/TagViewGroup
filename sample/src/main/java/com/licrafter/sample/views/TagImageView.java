@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import com.licrafter.sample.R;
 import com.licrafter.sample.model.TagGroupModel;
 import com.licrafter.sample.utils.AnimatorUtils;
+import com.licrafter.sample.utils.DirectionUtils;
 import com.licrafter.sample.utils.ImageLoader;
 import com.licrafter.tagview.DIRECTION;
 import com.licrafter.tagview.TagAdapter;
@@ -105,7 +106,7 @@ public class TagImageView extends FrameLayout {
 
     public TagTextView makeTagTextView(TagGroupModel.Tag tag) {
         TagTextView tagTextView = new TagTextView(getContext());
-        tagTextView.setDirection(DIRECTION.valueOf(tag.getDirection()));
+        tagTextView.setDirection(DirectionUtils.getDirection(tag.getDirection()));
         tagTextView.setText(tag.getName());
         return tagTextView;
     }
@@ -145,7 +146,7 @@ public class TagImageView extends FrameLayout {
     }
 
     public void onTagClicked(TagViewGroup group, ITagView tagView, int position) {
-        mTagGroupModelList.get(mTagGroupViewList.indexOf(group)).getTags().get(position).setDirection(tagView.getDirection().getValue() % 10 + 1);
+        mTagGroupModelList.get(mTagGroupViewList.indexOf(group)).getTags().get(position).setDirection(DirectionUtils.getValue(tagView.getDirection()) % 10 + 1);
         group.getTagAdapter().notifyDataSetChanged();
     }
 

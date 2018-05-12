@@ -2,8 +2,6 @@ package com.licrafter.sample;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -16,8 +14,6 @@ import com.licrafter.sample.views.TagEditDialog;
 import com.licrafter.sample.views.TagImageView;
 import com.licrafter.tagview.TagViewGroup;
 import com.licrafter.tagview.views.ITagView;
-
-import java.util.Random;
 
 
 /**
