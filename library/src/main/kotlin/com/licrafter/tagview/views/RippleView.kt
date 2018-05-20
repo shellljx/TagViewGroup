@@ -61,12 +61,12 @@ class RippleView : View, ITagView {
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        mAnimator?.start()
+        mAnimator?.end()
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        mAnimator?.end()
+        mAnimator?.start()
     }
 
     //设置水波纹半径

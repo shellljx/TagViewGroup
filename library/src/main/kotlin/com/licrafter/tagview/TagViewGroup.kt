@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import com.licrafter.tagview.utils.DipConvertUtils
+import com.licrafter.tagview.utils.TagGroupUtils
 import com.licrafter.tagview.views.ITagView
 import java.util.ArrayList
 
@@ -78,87 +79,12 @@ class TagViewGroup : ViewGroup {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         measureChildren(widthMeasureSpec, heightMeasureSpec)
-        mChildUsed = getChildUsed()
+        mChildUsed = TagGroupUtils.getTagViewUsed(this)
         //园中心默认在左上角 (0,0)
         mCenterX = (measuredWidth * mPercentX).toInt()
         mCenterY = (measuredHeight * mPercentY).toInt()
         checkBounds()
         mCenterRect.set((mCenterX - mRadius).toFloat(), (mCenterY - mRadius).toFloat(), (mCenterX + mRadius).toFloat(), (mCenterY + mRadius).toFloat())
-    }
-
-    /**
-     * 获取中心圆上下左右各个方向的宽度
-     *
-     * @return int[]{left,top,right,bottom}
-     */
-    private fun getChildUsed(): IntArray {
-        var leftMax = mVDistance
-        var topMax = mVDistance
-        var rightMax = mVDistance
-        var bottomMax = mVDistance
-
-        for (i in 0 until childCount) {
-            if (getChildAt(i) !is ITagView) {
-                return intArrayOf(0, 0, 0, 0)
-            }
-            val child = getChildAt(i) as ITagView
-            when (child.getDirection()) {
-                DIRECTION.RIGHT_TOP_STRAIGHT//右上斜直线
-                -> {
-                    rightMax = Math.max(rightMax, mTDistance + child.getMeasuredWidth())
-                    topMax = Math.max(topMax, child.getMeasuredHeight() + mTDistance)
-                }
-                DIRECTION.RIGHT_TOP//右上折线
-                -> {
-                    rightMax = Math.max(rightMax, child.getMeasuredWidth())
-                    topMax = Math.max(topMax, child.getMeasuredHeight() + mVDistance)
-                }
-                DIRECTION.RIGHT_CENTER//右中折线
-                -> {
-                    rightMax = Math.max(rightMax, child.getMeasuredWidth())
-                    topMax = Math.max(topMax, Math.max(mVDistance, child.getMeasuredHeight()))
-                }
-                DIRECTION.RIGHT_BOTTOM//右下折线
-                -> {
-                    rightMax = Math.max(rightMax, child.getMeasuredWidth())
-                    bottomMax = mVDistance
-                }
-                DIRECTION.RIGHT_BOTTOM_STRAIGHT -> {
-                    rightMax = Math.max(rightMax, mTDistance + child.getMeasuredWidth())
-                    bottomMax = mTDistance
-                }
-                DIRECTION.LEFT_TOP//左上折线
-                -> {
-                    leftMax = Math.max(leftMax, child.getMeasuredWidth())
-                    topMax = Math.max(topMax, child.getMeasuredHeight() + mVDistance)
-                }
-                DIRECTION.LEFT_TOP_STRAIGHT//左上斜直线
-                -> {
-                    leftMax = Math.max(leftMax, child.getMeasuredWidth() + mTDistance)
-                    topMax = Math.max(topMax, child.getMeasuredHeight() + mTDistance)
-                }
-                DIRECTION.LEFT_CENTER//左中折线
-                -> {
-                    leftMax = Math.max(leftMax, child.getMeasuredWidth())
-                    topMax = Math.max(topMax, Math.max(mVDistance, child.getMeasuredHeight()))
-                }
-                DIRECTION.LEFT_BOTTOM//左下折线
-                -> {
-                    leftMax = Math.max(leftMax, child.getMeasuredWidth())
-                    bottomMax = mVDistance
-                }
-                DIRECTION.LEFT_BOTTOM_STRAIGHT//左下斜直线
-                -> {
-                    leftMax = Math.max(leftMax, child.getMeasuredWidth() + mTDistance)
-                    bottomMax = mTDistance
-                }
-                DIRECTION.CENTER
-                -> {
-                }
-            }
-
-        }
-        return intArrayOf(leftMax, topMax, rightMax, bottomMax)
     }
 
     private fun checkBounds() {
@@ -173,70 +99,13 @@ class TagViewGroup : ViewGroup {
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        var left = 0
-        var top = 0
         for (i in 0 until childCount) {
             if (getChildAt(i) !is ITagView) {
                 continue
             }
             val child = getChildAt(i) as ITagView
-            when (child.getDirection()) {
-                DIRECTION.RIGHT_TOP_STRAIGHT//右上斜线
-                -> {
-                    top = mCenterY - mTDistance - child.getMeasuredHeight()
-                    left = mCenterX + mTDistance
-                }
-                DIRECTION.RIGHT_TOP//右上
-                -> {
-                    left = mCenterX
-                    top = mCenterY - mVDistance - child.getMeasuredHeight()
-                }
-                DIRECTION.RIGHT_CENTER//右中
-                -> {
-                    left = mCenterX
-                    top = mCenterY - child.getMeasuredHeight()
-                }
-                DIRECTION.RIGHT_BOTTOM//右下
-                -> {
-                    left = mCenterX
-                    top = mVDistance + mCenterY - child.getMeasuredHeight()
-                }
-                DIRECTION.RIGHT_BOTTOM_STRAIGHT//右下斜线
-                -> {
-                    left = mCenterX + mTDistance
-                    top = mTDistance + mCenterY - child.getMeasuredHeight()
-                }
-                DIRECTION.LEFT_TOP//左上
-                -> {
-                    left = mCenterX - child.getMeasuredWidth()
-                    top = mCenterY - mVDistance - child.getMeasuredHeight()
-                }
-                DIRECTION.LEFT_TOP_STRAIGHT//左上斜线
-                -> {
-                    left = mCenterX - child.getMeasuredWidth() - mTDistance
-                    top = mCenterY - mTDistance - child.getMeasuredHeight()
-                }
-                DIRECTION.LEFT_CENTER//左中
-                -> {
-                    left = mCenterX - child.getMeasuredWidth()
-                    top = mCenterY - child.getMeasuredHeight()
-                }
-                DIRECTION.LEFT_BOTTOM//左下
-                -> {
-                    left = mCenterX - child.getMeasuredWidth()
-                    top = mVDistance + mCenterY - child.getMeasuredHeight()
-                }
-                DIRECTION.LEFT_BOTTOM_STRAIGHT//左下斜线
-                -> {
-                    left = mCenterX - child.getMeasuredWidth() - mTDistance
-                    top = mTDistance + mCenterY - child.getMeasuredHeight()
-                }
-                DIRECTION.CENTER -> {
-                    left = mCenterX - child.getMeasuredWidth() / 2
-                    top = mCenterY - child.getMeasuredHeight() / 2
-                }
-            }
-            child.layout(left, top, left + child.getMeasuredWidth(), top + child.getMeasuredHeight())
+            val point = TagGroupUtils.getStartPoint(this, child)
+            child.layout(point.x, point.y, point.x + child.getMeasuredWidth(), point.y + child.getMeasuredHeight())
             refreshTagsInfo(child)
         }
     }
@@ -402,7 +271,7 @@ class TagViewGroup : ViewGroup {
         }
     }
 
-    fun infoForTagView(tagView: ITagView): ItemInfo? {
+    private fun infoForTagView(tagView: ITagView): ItemInfo? {
         for (i in mItems.indices) {
             val info = mItems[i]
             if (info.item == tagView) {
