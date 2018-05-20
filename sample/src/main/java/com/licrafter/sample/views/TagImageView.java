@@ -19,6 +19,7 @@ import com.licrafter.tagview.DIRECTION;
 import com.licrafter.tagview.TagAdapter;
 import com.licrafter.tagview.TagViewGroup;
 import com.licrafter.tagview.views.ITagView;
+import com.licrafter.tagview.views.RippleView;
 import com.licrafter.tagview.views.TagTextView;
 
 import java.util.ArrayList;
@@ -92,16 +93,27 @@ public class TagImageView extends FrameLayout {
         tagViewGroup.setTagAdapter(new TagAdapter() {
             @Override
             public int getCount() {
-                return model.getTags().size();
+                return model.getTags().size() + 1;
             }
 
             @Override
             public ITagView getItem(int position) {
-                return makeTagTextView(model.getTags().get(position));
+                if (position < model.getTags().size()) {
+                    return makeTagTextView(model.getTags().get(position));
+                } else {
+                    return makeRippleView();
+                }
             }
         });
         tagViewGroup.setPercent(model.getPercentX(), model.getPercentY());
         return tagViewGroup;
+    }
+
+    public RippleView makeRippleView() {
+        RippleView rippleView = new RippleView(getContext());
+        rippleView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        rippleView.setDirection(DIRECTION.CENTER);
+        return rippleView;
     }
 
     public TagTextView makeTagTextView(TagGroupModel.Tag tag) {
@@ -128,7 +140,7 @@ public class TagImageView extends FrameLayout {
                 group.setVisibility(INVISIBLE);
             }
         });
-        group.setHideAnimator(hideAnimator).setShowAnimator(showAnimator).addRipple();
+        group.setHideAnimator(hideAnimator).setShowAnimator(showAnimator);
     }
 
     public void excuteTagsAnimation() {

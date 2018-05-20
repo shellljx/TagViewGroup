@@ -13,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.licrafter.tagview.utils.DipConvertUtils
 import com.licrafter.tagview.views.ITagView
-import com.licrafter.tagview.views.RippleView
 import java.util.ArrayList
 
 /**
@@ -33,12 +32,7 @@ class TagViewGroup : ViewGroup {
     private var mClickListener: OnTagGroupClickListener? = null
     private var mScrollListener: OnTagGroupDragListener? = null
     private val mObserver = TagSetObserver()
-    private var mRippleView: RippleView? = null
 
-
-    private var mRippleMaxRadius: Int   //水波纹最大半径
-    private val mRippleMinRadius: Int   //水波纹最小半径
-    private var mRippleAlpha: Int       //水波纹起始透明度
     private var mRadius: Int            //外圆半径
     private var mInnerRadius: Int       //内圆半径
     private var mTDistance: Int         //斜线长度
@@ -73,9 +67,6 @@ class TagViewGroup : ViewGroup {
             mTDistance = array.getDimensionPixelSize(R.styleable.TagViewGroup_tilt_distance, DipConvertUtils.dip2px(context, DEFAULT_TILT_DISTANCE.toFloat()))
             mVDistance = array.getDimensionPixelSize(R.styleable.TagViewGroup_v_distance, DipConvertUtils.dip2px(context, DEFAULT_V_DISTANCE.toFloat()))
             mLinesWidth = array.getDimensionPixelSize(R.styleable.TagViewGroup_line_width, DipConvertUtils.dip2px(context, DEFAULT_LINES_WIDTH.toFloat()))
-            mRippleMaxRadius = array.getDimensionPixelSize(R.styleable.TagViewGroup_ripple_maxRadius, DipConvertUtils.dip2px(context, DEFAULT_RIPPLE_MAX_RADIUS.toFloat()))
-            mRippleAlpha = array.getInteger(R.styleable.TagViewGroup_ripple_alpha, DEFULT_RIPPLE_ALPHA)
-            mRippleMinRadius = mInnerRadius + (mRadius - mInnerRadius) / 2
         } finally {
             array.recycle()
         }
@@ -93,9 +84,6 @@ class TagViewGroup : ViewGroup {
         mCenterY = (measuredHeight * mPercentY).toInt()
         checkBounds()
         mCenterRect.set((mCenterX - mRadius).toFloat(), (mCenterY - mRadius).toFloat(), (mCenterX + mRadius).toFloat(), (mCenterY + mRadius).toFloat())
-        mRippleView?.let {
-            it.setCenterPoint(mCenterX, mCenterY)
-        }
     }
 
     /**
@@ -110,7 +98,9 @@ class TagViewGroup : ViewGroup {
         var bottomMax = mVDistance
 
         for (i in 0 until childCount) {
-            //todo 转换有可能出错
+            if (getChildAt(i) !is ITagView) {
+                return intArrayOf(0, 0, 0, 0)
+            }
             val child = getChildAt(i) as ITagView
             when (child.getDirection()) {
                 DIRECTION.RIGHT_TOP_STRAIGHT//右上斜直线
@@ -186,6 +176,9 @@ class TagViewGroup : ViewGroup {
         var left = 0
         var top = 0
         for (i in 0 until childCount) {
+            if (getChildAt(i) !is ITagView) {
+                continue
+            }
             val child = getChildAt(i) as ITagView
             when (child.getDirection()) {
                 DIRECTION.RIGHT_TOP_STRAIGHT//右上斜线
@@ -239,8 +232,8 @@ class TagViewGroup : ViewGroup {
                     top = mTDistance + mCenterY - child.getMeasuredHeight()
                 }
                 DIRECTION.CENTER -> {
-                    left = 0
-                    top = 0
+                    left = mCenterX - child.getMeasuredWidth() / 2
+                    top = mCenterY - child.getMeasuredHeight() / 2
                 }
             }
             child.layout(left, top, left + child.getMeasuredWidth(), top + child.getMeasuredHeight())
@@ -260,16 +253,6 @@ class TagViewGroup : ViewGroup {
         mPaint.style = Paint.Style.FILL
         mPaint.color = Color.WHITE
         canvas.drawCircle(mCenterX.toFloat(), mCenterY.toFloat(), mInnerRadius.toFloat(), mPaint)
-    }
-
-    override fun onAttachedToWindow() {
-        mRippleView?.let { it.startRipple() }
-        super.onAttachedToWindow()
-    }
-
-    override fun onDetachedFromWindow() {
-        mRippleView?.let { it.stopRipple() }
-        super.onDetachedFromWindow()
     }
 
     private fun drawTagAlpha(alpha: Float) {
@@ -336,18 +319,6 @@ class TagViewGroup : ViewGroup {
             list.add(mItems[i].item!!)
         }
         return list
-    }
-
-    /**
-     * 添加水波纹
-     */
-    fun addRipple(): TagViewGroup {
-        mRippleView = RippleView(context)
-        mRippleView!!.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        mRippleView!!.setDirection(DIRECTION.CENTER)
-        mRippleView!!.initAnimator(mRippleMinRadius, mRippleMaxRadius, mRippleAlpha)
-        addView(mRippleView)
-        return this
     }
 
     fun startShowAnimator() {
@@ -426,7 +397,6 @@ class TagViewGroup : ViewGroup {
     }
 
     private fun refreshTagsInfo(child: ITagView) {
-        //todo CENTER被过滤掉？最好不要特异性
         if (child.getDirection() != DIRECTION.CENTER) {
             infoForTagView(child)!!.rectF.set(child.getLeft().toFloat(), child.getTop().toFloat(), child.getRight().toFloat(), child.getBottom().toFloat())
         }
@@ -540,11 +510,14 @@ class TagViewGroup : ViewGroup {
             super.onLongPress(e)
             val x = e.x
             val y = e.y
-            if (x.equals(y))
-                if (mCenterRect.contains(x, y) || isTouchingTags(x, y) != null) {
-                    mClickListener?.onLongPress(this@TagViewGroup)
-                }
+            if (mCenterRect.contains(x, y) || isTouchingTags(x, y) != null) {
+                mClickListener?.onLongPress(this@TagViewGroup)
+            }
         }
+    }
+
+    fun getCenterPoint(): Point {
+        return Point(mCenterX, mCenterY)
     }
 
     /**
@@ -640,32 +613,6 @@ class TagViewGroup : ViewGroup {
         return mTDistance
     }
 
-    /**
-     * 设置水波纹最大半径
-     *
-     * @param radius 最大半径
-     */
-    fun setRippleMaxRadius(radius: Int) {
-        mRippleMaxRadius = radius
-    }
-
-    fun getRippleMaxRadius(): Int {
-        return mRippleMaxRadius
-    }
-
-    /**
-     * 设置水波纹起始透明度
-     *
-     * @param alpha 透明度
-     */
-    fun setRippleAlpha(alpha: Int) {
-        mRippleAlpha = alpha
-    }
-
-    fun getRippleAlpha(): Int {
-        return mRippleAlpha
-    }
-
     inner class TagSetObserver : DataSetObserver() {
 
         override fun onChanged() {
@@ -686,10 +633,6 @@ class TagViewGroup : ViewGroup {
         const val DEFAULT_LINES_WIDTH: Int = 1
         //默认标签最大数量
         const val DEFAULT_MAX_TAG: Int = 6
-        //水波纹默认最大半径
-        const val DEFAULT_RIPPLE_MAX_RADIUS: Int = 20
-        //默认水波纹透明度
-        const val DEFULT_RIPPLE_ALPHA: Int = 100
 
         @JvmField
         val CIRCLE_RADIUS: Property<TagViewGroup, Int> = object : Property<TagViewGroup, Int>(Int::class.java, "circleRadius") {
