@@ -1,11 +1,11 @@
 # TagViewGroup
-Android 仿`小红书`图片标签，实现了图片标签的动画，布局，水波纹，编辑等功能，还可以自定义 Tag。[视频演示地址](http://7vzpfd.com1.z0.glb.clouddn.com/shamuMMB29Klijx12252016215920.mp4)
+Android 仿`小红书`图片标签，实现了图片标签的动画，布局，水波纹，编辑等功能，还可以自定义 Tag。[视频演示地址](http://qiniu.licrafter.com/shamuMMB29Klijx12252016215920.mp4)
 
-This is a library of tags that are attached to the picture,you can add tags and ripple effects very easily.[Video demo](http://7vzpfd.com1.z0.glb.clouddn.com/shamuMMB29Klijx12252016215920.mp4)
+This is a library of tags that are attached to the picture,you can add tags and ripple effects very easily.[Video demo](http://qiniu.licrafter.com/shamuMMB29Klijx12252016215920.mp4)
 
 [![](https://jitpack.io/v/shellljx/TagViewGroup.svg)](https://jitpack.io/#shellljx/TagViewGroup)
 
-![](http://7vzpfd.com1.z0.glb.clouddn.com/ezgif.com-dc9f221590.gif)
+![](http://qiniu.licrafter.com/ezgif.com-dc9f221590.gif)
 
 # Important Update
 1. added `TagAdapter` and make it easier to create TagViewGroup.
