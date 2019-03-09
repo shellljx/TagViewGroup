@@ -1,6 +1,7 @@
 ext{
-    supportLib = '27.0.2'
-    targetVersion = 27
+    supportLib = '28.0.0'
+    buildTool = '28.0.3'
+    targetVersion = 28
     minVersion = 15
     picasso = '2.5.2'
     junit = '4.12'

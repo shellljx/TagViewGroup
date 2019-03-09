@@ -4,7 +4,7 @@ apply from: new File('../dependence.gradle')
 
 android {
     compileSdkVersion project.ext.targetVersion
-    buildToolsVersion "${project.ext.supportLib}"
+    buildToolsVersion "${project.ext.buildTool}"
 
     defaultConfig {
         minSdkVersion project.ext.minVersion
@@ -30,14 +30,11 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     api "com.android.support:appcompat-v7:${project.ext.supportLib}"
-    testCompile "junit:junit:${project.ext.junit}"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-}
-repositories {
-    mavenCentral()
+    testImplementation "junit:junit:${project.ext.junit}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }

@@ -3,7 +3,7 @@ apply from: new File('../dependence.gradle')
 
 android {
     compileSdkVersion project.ext.targetVersion
-    buildToolsVersion "${project.ext.supportLib}"
+    buildToolsVersion "${project.ext.buildTool}"
     defaultConfig {
         applicationId 'com.licrafter.sample'
         minSdkVersion project.ext.minVersion
@@ -23,14 +23,14 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    api "com.android.support:appcompat-v7:${project.ext.supportLib}"
-    api "com.android.support:design:${project.ext.supportLib}"
-    api "com.squareup.picasso:picasso:${project.ext.picasso}"
-    testCompile "junit:junit:${project.ext.junit}"
+    implementation "com.android.support:appcompat-v7:${project.ext.supportLib}"
+    implementation "com.android.support:design:${project.ext.supportLib}"
+    implementation "com.squareup.picasso:picasso:${project.ext.picasso}"
+    testImplementation "junit:junit:${project.ext.junit}"
     //implementation "com.github.shellljx:TagViewGroup:${project.ext.tagViewGroup}"
     implementation project(path: ':library')
 }
